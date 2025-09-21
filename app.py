@@ -72,6 +72,7 @@ def create():
 
 @app.route("/user_attributes.html")
 def user_attributes():
+
     # To prefill forms, let's fetch existing user data first.
     user_id = session["user_id"]
     username = session["username"]
@@ -103,6 +104,21 @@ def add_user_data():
 
     flash("Käyttäjädata päivitetty")        
     return redirect("/")
+
+
+@app.route("/workouts.html")
+def workouts():
+    # Fetch workouts from db
+    return render_template("workouts.html")
+    
+
+@app.route("/add_workout", methods=["POST"])
+def add_workout():
+    # fetch the sport type "in real time", this might have to be done
+    # in two steps where the user first adds the discipline and then the sport
+    # type is fetched based on that. At lightest, this is a button next to the
+    # sport type and there's some conditionality in the html file.
+    pass
 
 @app.route("/logout")
 def logout():
