@@ -5,7 +5,6 @@ create table users (
 	first_name TEXT, 
 	last_name TEXT,
 	date_of_birth TEXT, 
-	date_of_death TEXT,
 	weight NUMERIC, 
 	height NUMERIC, 
 	fav_sport_id INTEGER REFERENCES sports(sport_id), 
@@ -41,7 +40,7 @@ create table exercises_and_sports (
 CREATE TABLE exercises_and_purposes (
 	id INTEGER PRIMARY KEY,
 	exercise_id INTEGER REFERENCES exercises(exercise_id),
-	purpose_idINTEGER REFERENCES exercise_purposes(purpose_id)
+	purpose_id INTEGER REFERENCES exercise_purposes(purpose_id)
 );
 
 --User can add multiple excercises in one workout
@@ -54,7 +53,7 @@ create table workouts (
 	begin_time TEXT, 
 	end_time TEXT, 
 	user_id INTEGER,
-	excercise_id INTEGER REFERENCES excercises(excercise_id),
+	exercise_id INTEGER REFERENCES exercises(exercise_id),
 	purpose_id INTEGER REFERENCES exercise_purposes(purpose_id),
 	sets INTEGER,
 	reps INTEGER,

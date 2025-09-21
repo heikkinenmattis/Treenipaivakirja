@@ -38,4 +38,29 @@ def fetch_userdata(user_id):
 
     return db.query(sql, [user_id])
 
-    
+
+def fetch_exercises(sport_id):
+    sql = """   SELECT DISTINCT e.exercise_name, e.exercise_id   
+                FROM exercises_and_sports es
+                JOIN exercises e
+                    on es.exercise_id = e.exercise_id
+                WHERE es.sport_id = ?
+                ORDER BY 1"""
+
+    return db.query(sql, [sport_id])
+
+def fetch_sports():
+    sql = """   SELECT DISTINCT sport_id, sport_name from sports where 1 = ?"""
+
+    return db.query(sql, [1])
+
+def fetch_sport_type(sport_id):
+    sql = """   SELECT sport_type from sports where sport_id = ?"""
+
+    return db.query(sql, [sport_id])
+
+def insert_workout(workout_id, user_id, sport_id, begin_time, end_time, comments):
+    sql = """INSERT INTO workouts (workout_id, user_id, sport_id, begin_time, end_time, comments)
+                            VALUES (?,?,?,?,?,?)
+                """
+    db.execute(sql, [workout_id, user_id, sport_id, begin_time, end_time, comments])

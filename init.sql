@@ -2,7 +2,7 @@ delete from sports;
 insert into sports (sport_id, sport_name, sport_type) values (1, "Running", "Endurance"),(2, "Cycling", "Endurance"),(3, "Powerlifting", "Strength"),(4, "Weightlifting", "Strength");
 
 
-delete from excercises;
+delete from exercises;
 
 INSERT INTO EXERCISES (EXERCISE_ID, EXERCISE_NAME) VALUES (1,'Back squat');
 INSERT INTO EXERCISES (EXERCISE_ID, EXERCISE_NAME) VALUES (2,'Bench press');

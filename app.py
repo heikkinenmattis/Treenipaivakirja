@@ -4,6 +4,7 @@ import db
 import utils
 import items
 import time
+import uuid
 
 from flask import Flask
 from flask import redirect, render_template, request, flash
@@ -108,17 +109,40 @@ def add_user_data():
 
 @app.route("/workouts.html")
 def workouts():
-    # Fetch workouts from db
-    return render_template("workouts.html")
+    sports = items.fetch_sports()
+    return render_template("workouts.html", sports=sports)
     
 
 @app.route("/add_workout", methods=["POST"])
 def add_workout():
-    # fetch the sport type "in real time", this might have to be done
-    # in two steps where the user first adds the discipline and then the sport
-    # type is fetched based on that. At lightest, this is a button next to the
-    # sport type and there's some conditionality in the html file.
-    pass
+
+    # Keep the form this way. Don't fetch the sport from db. 
+    # It can be fixed later. This can be quick and dirty for now.
+    # Fetch the exercises for the sport and try to make that small bit work. This is fairly easy.
+
+        
+    sports = items.fetch_sports()
+    workout_id = uuid.uuid4()
+    workout_id = str(workout_id)
+    sport_id = request.form["sport"]
+    sport_id = int(sport_id)
+    sport_type = items.fetch_sport_type(sport_id)[0][0]
+    exercises = items.fetch_exercises(sport_id)
+
+
+    begin_time = request.form["begin_time"]
+    end_time = request.form["end_time"]
+    comments = request.form["comments"]
+    user_id = session["user_id"]
+
+    print(f"comments: {comments}, begin_time: {begin_time}, end_time: {end_time}, user_id = {user_id}, sport_id: {sport_id}, workout_id: {workout_id}")
+
+    items.insert_workout(workout_id = workout_id, user_id = user_id, sport_id = sport_id, 
+                         begin_time=begin_time, end_time=end_time, comments=comments)
+
+    flash("Suoritus päivitetty")
+    return redirect("/")
+    # return render_template("workouts.html", exercises = exercises, sport_type = sport_type, sport_id = sport_id, sports=sports)
 
 @app.route("/logout")
 def logout():

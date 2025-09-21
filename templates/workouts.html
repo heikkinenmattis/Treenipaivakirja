@@ -1,0 +1,58 @@
+
+{% extends "layout.html" %}
+
+{% block title %}Syötä treenisi{% endblock %}
+
+{% block content %}
+
+
+<form action="/add_workout" method="post">
+  
+  <label for="sport">Choose a sport:</label>
+
+  <select name="sport" id="sport">
+  
+  {% for sport in sports %}
+    {% if not sport_id %} 
+      <option value="{{ sport.sport_id }}">{{ sport.sport_name }}</option>
+    {% else %}
+      {% if sport_id == sport.sport_id %}
+        <option value="{{ sport.sport_id }}" selected>{{ sport.sport_name }}</option>
+      {% else %}
+        <option value="{{ sport.sport_id }}">{{ sport.sport_name }}</option>
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+  
+
+  </select>
+
+  <!-- <input type="submit" value="Confirm sport"/> -->
+
+  <p>
+    Begin time: <br />
+    <input type="datetime-local" name="begin_time" />
+  </p>
+  <p>
+    End time: <br />
+    <input type="datetime-local" name="end_time" />
+  </p>
+
+  <p>
+    Athlete comment: <br />
+    <textarea name="comments" rows="5" cols="40"></textarea>
+  </p>
+
+  <!-- <label for="exercise">Choose an exercise:</label>
+  <select name="exercise" id="exercise">
+
+  {% for exercise in exercises %} 
+    <option value="{{ exercise.exercise_id }}">{{ exercise.exercise_name }}</option>
+  {% endfor %}
+  </select> -->
+
+  <input type="submit" value="Save workout"/>
+
+</form>
+
+{% endblock %}
