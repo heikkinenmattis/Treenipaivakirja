@@ -85,20 +85,19 @@ def add_user_data():
     # Fetch user name. It is unique so it can be used in the building phase.
     session_username = session["username"]
 
-    firstname = request.form["firstname"]
-    lastname = request.form["lastname"]
-    dateofbirth = request.form["dateofbirth"]
+    first_name = request.form["first_name"]
+    last_name = request.form["last_name"]
+    date_of_birth = request.form["date_of_birth"]
     weight = request.form["weight"]
     height = request.form["height"]
-    max_heart_rate = request.form["maxhr"]
-    ftp_cycling = request.form["ftp"]
+    max_heart_rate = request.form["max_heart_rate"]
+    ftp_cycling = request.form["ftp_cycling"]
 
-    # fav_sport tulee dropdownista
-    # gender tulee dropdownista
-    # city tulee dropdownista
+    # fav_sport yet to come from a dropdown
+    # city yet to come from a dropdown
 
-    items.add_userdata(username = session_username, firstname = firstname, 
-                       lastname = lastname, dateofbirth = dateofbirth, 
+    items.add_userdata(username = session_username, first_name = first_name, 
+                       last_name = last_name, date_of_birth = date_of_birth, 
                        weight = weight, height = height, 
                        max_heart_rate = max_heart_rate, ftp_cycling = ftp_cycling)
 

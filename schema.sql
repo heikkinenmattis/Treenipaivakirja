@@ -20,7 +20,7 @@ create table users (
 	height NUMERIC, 
 	fav_sport_id INTEGER REFERENCES sports(sport_id), 
 	max_heart_rate INTEGER,	
-	FTP_Cycling INTEGER,
+	ftp_cycling INTEGER,
 	city_id INTEGER REFERENCES cities(city_id)
 );
 

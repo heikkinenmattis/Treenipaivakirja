@@ -1,6 +1,6 @@
 import db
 
-def add_userdata(username, firstname, lastname, dateofbirth, height, weight,
+def add_userdata(username, first_name, last_name, date_of_birth, height, weight,
                  max_heart_rate, ftp_cycling):
     sql = """UPDATE users SET 
                 first_name = ?, 
@@ -9,9 +9,9 @@ def add_userdata(username, firstname, lastname, dateofbirth, height, weight,
                 height = ?, 
                 weight = ?,
                 max_heart_rate = ?, 
-                ftp_cycling = ?,
+                ftp_cycling = ?
                 where username = ?"""
-    db.execute(sql, [firstname, lastname, dateofbirth, height, weight,
+    db.execute(sql, [first_name, last_name, date_of_birth, height, weight,
                  max_heart_rate, ftp_cycling, username])
 
 
