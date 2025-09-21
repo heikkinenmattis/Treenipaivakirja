@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block title %}Syötä käyttäjätietosi{% endblock %}
+
+{% block content %}
+
+
+<form action="/add_user_data" method="post">
+  <p>
+    First name: <br />
+    <input type="text" name="firstname" value="{{userdata["first_name"]}}" />
+  </p>
+  <p>
+    Last name: <br />
+    <input type="text" name="lastname" value="{{userdata["last_name"]}}"/>
+  </p>
+  <p>
+    Date of birth: <br />
+    <input type="date" name="dateofbirth" value="{{userdata["date_of_birth"]}}"/>
+  </p>
+  <p>
+    Weight: <br />
+    <input type="number" name="weight" value="{{userdata["weight"]}}"/>
+  </p>
+  <p>
+    Height: <br />
+    <input type="number" name="height" value="{{userdata["height"]}}"/>
+  </p>
+  <p>
+    Maximum heart rate: <br />
+    <input type="number" name="maxhr" value="{{userdata["max_heart_rate"]}}"/>
+
+  </p>
+  <p>
+    FTP: <br />
+    <input type="number" name="ftp" value="{{userdata["ftp_cycling"]}}"/>
+  </p>
+  <input type="submit" value="Save user data"/>
+  <!--Tämän submit-napin pitäis varmaan johtaakin johonkin :) -->    
+</form>
+
+{% endblock %}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>{% block title %}{% endblock %}</title>
+  <link rel="stylesheet" href="../static/style.css">
+</head>	
+
+<body>
+  <h1>HYBRIDATH-1337</h1>
+  
+  <p>
+    Never miss a workout
+  </p>
+
+  {% if session.username %}
+
+  <p>
+    Olet kirjautunut nimellä {{ session.username }}
+  </p>
+
+  <p>
+    <a href="/logout">Kirjaudu ulos</a>
+  </p>
+  <p>
+    <a href="/user_attributes.html">Käyttäjäasetukset</a>
+  </p>		
+
+  {% endif %}
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class=flashes>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+
+  {% block content %}{% endblock %} 
+  <!--Links here when it's time.-->
+
+</body>
+
+</html>
