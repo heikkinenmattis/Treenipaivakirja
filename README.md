@@ -9,3 +9,11 @@
 - Käyttäjä voi hakea muiden suoritettuja harjoituksia kategorialla tai hakusanalla.
 - Sovelluksessa on tilastosivut, jotka näyttävät tilastoja käyttäjän suorittamista harjoituksista.
 - Käyttäjä voi kommentoida toisten tekemiä harjoituksia.
+
+
+
+## Näin saat käyntiin
+
+- Asenna flask-kirjasto "pip install flask"
+- Luo tietokannan tiedot ja lisää alkutiedot "sqlite3 database.db < schema.sql && sqlite3 database.db < init.sql"
+-Käynnistä sovellus ajamalla "flask run"
