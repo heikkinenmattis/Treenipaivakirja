@@ -122,27 +122,27 @@ def add_workout():
 
         
     sports = items.fetch_sports()
-    workout_id = uuid.uuid4()
-    workout_id = str(workout_id)
-    sport_id = request.form["sport"]
-    sport_id = int(sport_id)
+    workout_id = str(uuid.uuid4())
+    sport_id = int(request.form["sport"])
     sport_type = items.fetch_sport_type(sport_id)[0][0]
     exercises = items.fetch_exercises(sport_id)
-
+    purposes = items.fetch_purposes(sport_type)
+    
 
     begin_time = request.form["begin_time"]
     end_time = request.form["end_time"]
     comments = request.form["comments"]
     user_id = session["user_id"]
 
-    print(f"comments: {comments}, begin_time: {begin_time}, end_time: {end_time}, user_id = {user_id}, sport_id: {sport_id}, workout_id: {workout_id}")
+    # print(f"comments: {comments}, begin_time: {begin_time}, end_time: {end_time}, user_id = {user_id}, sport_id: {sport_id}, workout_id: {workout_id}")
 
     items.insert_workout(workout_id = workout_id, user_id = user_id, sport_id = sport_id, 
                          begin_time=begin_time, end_time=end_time, comments=comments)
 
     flash("Suoritus päivitetty")
-    return redirect("/")
-    # return render_template("workouts.html", exercises = exercises, sport_type = sport_type, sport_id = sport_id, sports=sports)
+    #return redirect("/")
+    return render_template("workouts.html", exercises = exercises, sport_type = sport_type, 
+                           sport_id = sport_id, sports=sports, purposes=purposes)
 
 @app.route("/logout")
 def logout():

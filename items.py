@@ -60,7 +60,37 @@ def fetch_sport_type(sport_id):
     return db.query(sql, [sport_id])
 
 def insert_workout(workout_id, user_id, sport_id, begin_time, end_time, comments):
-    sql = """INSERT INTO workouts (workout_id, user_id, sport_id, begin_time, end_time, comments)
-                            VALUES (?,?,?,?,?,?)
+    sql = """   INSERT INTO workouts (workout_id, user_id, sport_id, begin_time, end_time, comments)
+                    VALUES (?,?,?,?,?,?)
                 """
     db.execute(sql, [workout_id, user_id, sport_id, begin_time, end_time, comments])
+
+
+
+def fetch_purposes(sport_type):
+    sql = """   SELECT DISTINCT p.purpose_id, p.purpose_name 
+                FROM sports s 
+                JOIN exercises_and_sports es 
+                    on s.sport_id = es.sport_id 
+                JOIN exercises_and_purposes ep 
+                    on es.exercise_id = ep.exercise_id 
+                JOIN exercise_purposes p 
+                    on ep.purpose_id = p.purpose_id 
+                where s.sport_type = ? 
+            """
+
+    return db.query(sql, [sport_type])
+
+
+
+    
+
+
+
+
+
+
+
+
+
+

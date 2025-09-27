@@ -27,7 +27,7 @@
 
   </select>
 
-  <!-- <input type="submit" value="Confirm sport"/> -->
+  <input type="submit" value="Confirm sport"/>
 
   <p>
     Begin time: <br />
@@ -43,13 +43,21 @@
     <textarea name="comments" rows="5" cols="40"></textarea>
   </p>
 
-  <!-- <label for="exercise">Choose an exercise:</label>
+  <label for="exercise">Choose an exercise:</label>
   <select name="exercise" id="exercise">
 
   {% for exercise in exercises %} 
     <option value="{{ exercise.exercise_id }}">{{ exercise.exercise_name }}</option>
   {% endfor %}
-  </select> -->
+  </select>
+
+  <label for="purpose">Choose a purpose:</label>
+  <select name="purpose" id="purpose">
+
+  {% for purpose in purposes %} 
+    <option value="{{ purpose.purpose_id }}">{{ purpose.purpose_name }}</option>
+  {% endfor %}
+  </select>                                                                         	
 
   <input type="submit" value="Save workout"/>
 
