@@ -46,7 +46,7 @@ CREATE TABLE exercises_and_purposes (
 
 create table workouts (
 	id INTEGER PRIMARY KEY, 
-	workout_id TEXT UNIQUE,
+	workout_id TEXT,
 	sport_id INTEGER REFERENCES sports(sport_id), 
 	begin_time TEXT, 
 	end_time TEXT, 

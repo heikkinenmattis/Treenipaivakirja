@@ -59,12 +59,19 @@ def fetch_sport_type(sport_id):
 
     return db.query(sql, [sport_id])
 
-def insert_workout(workout_id, user_id, sport_id, begin_time, end_time, comments):
-    sql = """   INSERT INTO workouts (workout_id, user_id, sport_id, begin_time, end_time, comments)
-                    VALUES (?,?,?,?,?,?)
+def insert_workout(workout_id, user_id, sport_id, begin_time, end_time, comments, sets, 
+                   reps, weight, minutes, avghr, kilometers, exercise_id, purpose_id):
+    sql = """   INSERT INTO workouts (workout_id, user_id, sport_id, begin_time, end_time, comments, sets, reps, weight, minutes, avg_hr, kilometers, exercise_id, purpose_id)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 """
-    db.execute(sql, [workout_id, user_id, sport_id, begin_time, end_time, comments])
+    db.execute(sql, [workout_id, user_id, sport_id, begin_time, end_time, comments, sets, reps, weight, minutes, avghr, kilometers, exercise_id, purpose_id])
 
+# def insert_workout(workout_id, user_id, sport_id, begin_time, end_time, comments, sets=None, 
+#                    reps=None, weight=None, minutes=None, avghr=None, kilometers=None):
+#     sql = """   INSERT INTO workouts (workout_id, user_id, sport_id, begin_time, end_time, comments, sets, reps, weight, minutes, avghr, kilometers)
+#                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+#                 """
+#     db.execute(sql, [workout_id, user_id, sport_id, begin_time, end_time, comments, sets, reps, weight, minutes, avghr, kilometers])
 
 
 def fetch_purposes(sport_type):

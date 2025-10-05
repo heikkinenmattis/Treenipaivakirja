@@ -182,14 +182,21 @@ def add_row():
  
 @app.route("/add_workout", methods=["POST"])
 def add_workout():
-        
+
+    global number_of_exercises
+    global sport_id
+    global exercise_details
+
+    #nämä muuttujat eivät ole tällä formilla.
+    print("entered add workout function")    
     sports = items.fetch_sports()
     workout_id = str(uuid.uuid4())
-    sport_id = int(request.form["sport"])
+    # sport_id = int(request.form["sport"])
     sport_type = items.fetch_sport_type(sport_id)[0][0]
     exercises = items.fetch_exercises(sport_id)
     purposes = items.fetch_purposes(sport_type)
-    
+
+    print("managed to fetch stuff but not times")    
 
     begin_time = request.form["begin_time"]
     end_time = request.form["end_time"]
@@ -197,16 +204,34 @@ def add_workout():
     user_id = session["user_id"]
 
     #Tähän tulee joku for-looppi, jossa käydään hakemassa exercise_detailsista 
+    for _, exercise in exercise_details.items():
 
 
-    items.insert_workout(workout_id = workout_id, user_id = user_id, sport_id = sport_id, 
-                         begin_time=begin_time, end_time=end_time, comments=comments)
+        if sport_type == "Endurance":
+            print("entered endurance")
+            items.insert_workout(workout_id = workout_id, user_id = user_id, sport_id = sport_id, 
+                                begin_time=begin_time, end_time=end_time, comments=comments,
+                                exercise_id = exercise["exercise_id"], purpose_id = exercise["purpose_id"],
+                                minutes=exercise["minutes"], avghr = exercise["avghr"], 
+                                kilometers = exercise["kilometers"], sets=None, reps=None, weight=None)
+
+
+        if sport_type == "Strength":
+            print("entered strength")
+            items.insert_workout(workout_id = workout_id, user_id = user_id, sport_id = sport_id, 
+                                begin_time=begin_time, end_time=end_time, comments=comments,
+                                exercise_id = exercise["exercise_id"], purpose_id = exercise["purpose_id"],
+                                sets=exercise["sets"], reps = exercise["reps"], weight = exercise["weight"],
+                                minutes=None, avghr=None, kilometers=None)
+            
+        
 
 
     flash("Suoritus päivitetty")
     # return redirect("/")
-    return render_template("workouts.html", exercises = exercises, sport_type = sport_type, 
-                           sport_id = sport_id, sports=sports, purposes=purposes)
+    return render_template("workouts.html", sports=sports, sport_type=sport_type,
+                           exercises = exercises, purposes=purposes, sport_id=sport_id, 
+                           number_of_exercises=number_of_exercises, exercise_details=exercise_details)
 
 
 @app.route("/logout")
