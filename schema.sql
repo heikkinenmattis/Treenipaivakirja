@@ -43,9 +43,7 @@ CREATE TABLE exercises_and_purposes (
 	purpose_id INTEGER REFERENCES exercise_purposes(purpose_id)
 );
 
---User can add multiple excercises in one workout
-	--make this a long data so that multiple
-	--excercises can take place under one workout
+
 create table workouts (
 	id INTEGER PRIMARY KEY, 
 	workout_id TEXT UNIQUE,
@@ -59,9 +57,9 @@ create table workouts (
 	reps INTEGER,
 	weight INTEGER,
 	comments TEXT,
-	avg_hr INTEGER
-	--maybe time on hr-zone 1-5 
-	--categorizing of excercise needs to be revised
+	avg_hr INTEGER,
+	minutes INTEGER,
+	kilometers INTEGER
 );
 
 

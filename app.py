@@ -110,16 +110,78 @@ def add_user_data():
 @app.route("/workouts.html")
 def workouts():
     sports = items.fetch_sports()
-    return render_template("workouts.html", sports=sports)
-    
+    return render_template("workouts.html", sports=sports, number_of_exercises=1, exercise_details={})
 
+sport_id = 1
+#Tämä näyttäis toimivan
+@app.route("/confirm_sport", methods=["POST"])
+def confirm_sport():
+    sports = items.fetch_sports()
+    
+    global sport_id
+
+    sport_id = int(request.form["sport"])
+    
+    sport_type = items.fetch_sport_type(sport_id)[0][0]
+    exercises = items.fetch_exercises(sport_id)
+    purposes = items.fetch_purposes(sport_type)
+
+
+    return render_template("workouts.html", sports=sports, sport_type=sport_type,
+                           exercises = exercises, purposes=purposes, sport_id=sport_id, 
+                           number_of_exercises=1, exercise_details={})
+
+
+# Toimii, kun sport_id on globaalina muuttujana. Seuraavaksi
+# pitää tehdä sellainen jeccu, että muuttujat html-formilla on nimiluokkaa
+# sets_1, sets_2, sets_3 jne, jotta ne voi syöttää takaisin. Lisäksi tuo number of
+# exercises pitää palauttaa ykköseen heti kun workout on postattu.
+number_of_exercises = 1
+exercise_details = {}
+
+@app.route("/add_row", methods=["POST"])
+def add_row():
+
+    global number_of_exercises
+    global sport_id
+    global exercise_details
+
+    sports = items.fetch_sports()
+    sport_type = items.fetch_sport_type(sport_id)[0][0]
+    exercises = items.fetch_exercises(sport_id)
+    purposes = items.fetch_purposes(sport_type)
+
+
+    for i in range(0,number_of_exercises):
+        print(f"entered for loop for EVERYTHING, iteration round{i}")
+        exercise_details[i] = {}
+        
+        exercise_details[i]["exercise_id"] = int(request.form[f"exercise_{i}"])
+        exercise_details[i]["purpose_id"] = int(request.form[f"purpose_{i}"])
+
+        if sport_type == "Endurance":
+            exercise_details[i]["minutes"] = request.form[f"minutes_{i}"]
+            exercise_details[i]["avghr"] = request.form[f"avghr_{i}"]
+            exercise_details[i]["kilometers"] = request.form[f"kilometers_{i}"]
+
+        if sport_type == "Strength":
+            exercise_details[i]["sets"] = request.form[f"sets_{i}"]
+            exercise_details[i]["reps"] = request.form[f"reps_{i}"]
+            exercise_details[i]["weight"] = request.form[f"weight_{i}"]
+
+    print(exercise_details)
+
+    number_of_exercises += 1
+
+
+    return render_template("workouts.html", sports=sports, sport_type=sport_type,
+                           exercises = exercises, purposes=purposes, sport_id=sport_id, 
+                           number_of_exercises=number_of_exercises, exercise_details=exercise_details)
+
+
+ 
 @app.route("/add_workout", methods=["POST"])
 def add_workout():
-
-    # Keep the form this way. Don't fetch the sport from db. 
-    # It can be fixed later. This can be quick and dirty for now.
-    # Fetch the exercises for the sport and try to make that small bit work. This is fairly easy.
-
         
     sports = items.fetch_sports()
     workout_id = str(uuid.uuid4())
@@ -134,15 +196,18 @@ def add_workout():
     comments = request.form["comments"]
     user_id = session["user_id"]
 
-    # print(f"comments: {comments}, begin_time: {begin_time}, end_time: {end_time}, user_id = {user_id}, sport_id: {sport_id}, workout_id: {workout_id}")
+    #Tähän tulee joku for-looppi, jossa käydään hakemassa exercise_detailsista 
+
 
     items.insert_workout(workout_id = workout_id, user_id = user_id, sport_id = sport_id, 
                          begin_time=begin_time, end_time=end_time, comments=comments)
 
+
     flash("Suoritus päivitetty")
-    #return redirect("/")
+    # return redirect("/")
     return render_template("workouts.html", exercises = exercises, sport_type = sport_type, 
                            sport_id = sport_id, sports=sports, purposes=purposes)
+
 
 @app.route("/logout")
 def logout():
