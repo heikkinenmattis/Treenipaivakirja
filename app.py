@@ -16,7 +16,8 @@ app.secret_key = config.secret_key
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    all_workouts = items.get_workouts()
+    return render_template("index.html", workouts=all_workouts)
 
 @app.route("/login", methods=["GET","POST"])
 def login():

@@ -89,15 +89,31 @@ def fetch_purposes(sport_type):
     return db.query(sql, [sport_type])
 
 
+def get_workouts():
+    sql = """   select  w.workout_id,
+                        u.username, 
+                        s.sport_name, 
+                        w.begin_time, 
+                        w.end_time,
+                        e.exercise_name,    
+                        p.purpose_name,
+                        w.sets,
+                        w.reps,
+                        w.weight,
+                        w.minutes,
+                        w.avg_hr,
+                        w.kilometers
 
+                from workouts w
+                join sports s on w.sport_id = s.sport_id
+                join users u on w.user_id = u.id
+                join exercises e on w.exercise_id = e.exercise_id
+                join exercise_purposes p on w.purpose_id = p.purpose_id 
+                where 1 = ?
+                """
+
+    return db.query(sql, [1])
     
-
-
-
-
-
-
-
 
 
 
