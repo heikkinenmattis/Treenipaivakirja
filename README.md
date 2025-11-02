@@ -1,5 +1,9 @@
 # Treenipäiväkirja
 
+Treenipäiväkirja-sovelluksessa käyttäjä voi kirjata tekemiään harjoituksia. Treenipäiväkirja tukee neljää lajia - juoksua, pyöräilyä, painonnostoa ja voimanostoa.
+
+Kuhunkin harjoitukseen kirjataan kesto ja harjoituksen sisältämät harjoitteet. Kunkin harjoitteen voi kategorisoida tarkoituksensa mukaan. Harjoite- ja tarkoitusuniversumi vaihtelee lajista riippuen.
+
 ## Sovelluksen toiminnot
 
 - Käyttäjä pystyy luomaan tunnuksen ja kirjautumaan sisään sovellukseen.
