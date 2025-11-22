@@ -1,19 +1,28 @@
 import sqlite3
 import config
-import db
-import utils
-import time
 import uuid
 import users
 import workouts
+import secrets
 
 from flask import Flask
-from flask import redirect, render_template, request, flash
+from flask import redirect, render_template, request, flash, abort
 from flask import session
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
+
+def require_login():
+    if "user_id" not in session:
+        abort(403)
+
+def check_csrf():
+    if "csrf_token" not in request.form:
+        abort(403)
+    if request.form["csrf_token"] != session["csrf_token"]:
+        abort(403)
+
 
 @app.route("/")
 def index():
@@ -22,6 +31,7 @@ def index():
 
 @app.route("/login", methods=["GET","POST"])
 def login():
+
     if request.method == "GET":
         return render_template("index.html")
 
@@ -30,21 +40,18 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
         
-        sql = "SELECT password_hash FROM users WHERE username = ?"
-        password_hash = db.query(sql, [username])[0][0]
+        user_id = users.check_login(username, password)
 
-        if check_password_hash(password_hash, password):
-            
-            sql = "SELECT id FROM users WHERE username = ?"
-            user_id = db.query(sql, [username])[0][0]
-
+        if user_id:
+            session["user_id"] = user_id
             session["username"] = username
-            session["user_id"] = user_id       
-
+            session["csrf_token"] = secrets.token_hex(16)
             return redirect("/")
         else:
             flash("VIRHE: väärä tunnus tai salasana")
-            return redirect("/")
+            return redirect("/login")
+
+
 
 
 @app.route("/register.html")
@@ -59,17 +66,13 @@ def create():
     password2 = request.form["password2"]
     if password1 != password2:
         flash("VIRHE: Salasanat eivät ole samat")        
-        return render_template("index.html")
+        return render_template("register.html")
     
-    #Using pbkdf2 for developement due to working on Macbook.
-    password_hash = generate_password_hash(password1, method='pbkdf2')
-
     try:
-        sql = "INSERT INTO users (username, password_hash) VALUES (?, ?)"
-        db.execute(sql, [username, password_hash])
+        users.create_user(username, password1)
     except sqlite3.IntegrityError:
         flash("VIRHE: tunnus on jo varattu")        
-        return render_template("index.html")
+        return render_template("register.html")
 
     flash("Tunnus luotu")
     return render_template("index.html")
@@ -243,9 +246,10 @@ def add_workout():
                            number_of_exercises=number_of_exercises, exercise_details=exercise_details)
 
 
+
 @app.route("/logout")
 def logout():
-    del session["username"]
-    del session["user_id"]
+    session.pop("user_id", None)
+    session.pop("username", None)
 
     return redirect("/")
