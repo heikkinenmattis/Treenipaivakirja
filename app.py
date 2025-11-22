@@ -2,9 +2,10 @@ import sqlite3
 import config
 import db
 import utils
-import items
 import time
 import uuid
+import users
+import workouts
 
 from flask import Flask
 from flask import redirect, render_template, request, flash
@@ -16,7 +17,7 @@ app.secret_key = config.secret_key
 
 @app.route("/")
 def index():
-    all_workouts = items.get_workouts()
+    all_workouts = workouts.get_workouts()
     return render_template("index.html", workouts=all_workouts)
 
 @app.route("/login", methods=["GET","POST"])
@@ -59,7 +60,9 @@ def create():
     if password1 != password2:
         flash("VIRHE: Salasanat eivät ole samat")        
         return render_template("index.html")
-    password_hash = generate_password_hash(password1)
+    
+    #Using pbkdf2 for developement due to working on Macbook.
+    password_hash = generate_password_hash(password1, method='pbkdf2')
 
     try:
         sql = "INSERT INTO users (username, password_hash) VALUES (?, ?)"
@@ -78,7 +81,7 @@ def user_attributes():
     # To prefill forms, let's fetch existing user data first.
     user_id = session["user_id"]
     username = session["username"]
-    userdata = items.fetch_userdata(user_id)[0]
+    userdata = users.fetch_userdata(user_id)[0]
 
     return render_template("user_attributes.html", userdata=userdata)
 
@@ -99,7 +102,7 @@ def add_user_data():
     # fav_sport yet to come from a dropdown
     # city yet to come from a dropdown
 
-    items.add_userdata(username = session_username, first_name = first_name, 
+    users.add_userdata(username = session_username, first_name = first_name, 
                        last_name = last_name, date_of_birth = date_of_birth, 
                        weight = weight, height = height, 
                        max_heart_rate = max_heart_rate, ftp_cycling = ftp_cycling)
@@ -109,23 +112,23 @@ def add_user_data():
 
 
 @app.route("/workouts.html")
-def workouts():
-    sports = items.fetch_sports()
+def workouts_page():
+    sports = workouts.fetch_sports()
     return render_template("workouts.html", sports=sports, number_of_exercises=1, exercise_details={})
 
 sport_id = 1
 #Tämä näyttäis toimivan
 @app.route("/confirm_sport", methods=["POST"])
 def confirm_sport():
-    sports = items.fetch_sports()
+    sports = workouts.fetch_sports()
     
     global sport_id
 
     sport_id = int(request.form["sport"])
     
-    sport_type = items.fetch_sport_type(sport_id)[0][0]
-    exercises = items.fetch_exercises(sport_id)
-    purposes = items.fetch_purposes(sport_type)
+    sport_type = workouts.fetch_sport_type(sport_id)[0][0]
+    exercises = workouts.fetch_exercises(sport_id)
+    purposes = workouts.fetch_purposes(sport_type)
 
 
     return render_template("workouts.html", sports=sports, sport_type=sport_type,
@@ -137,6 +140,11 @@ def confirm_sport():
 # pitää tehdä sellainen jeccu, että muuttujat html-formilla on nimiluokkaa
 # sets_1, sets_2, sets_3 jne, jotta ne voi syöttää takaisin. Lisäksi tuo number of
 # exercises pitää palauttaa ykköseen heti kun workout on postattu.
+
+# Muutetaan tämä niin, että alustetaan tyhjä exercise_details kenttineen, joka työnnetään
+# html formille. Näin ei tarvitsisi joka kerta käydä formilta katsomassa, onko sanakirjassa tavaraa.
+# Lisätietoja esimerkiksi Obsidianista.
+
 number_of_exercises = 1
 exercise_details = {}
 
@@ -147,10 +155,10 @@ def add_row():
     global sport_id
     global exercise_details
 
-    sports = items.fetch_sports()
-    sport_type = items.fetch_sport_type(sport_id)[0][0]
-    exercises = items.fetch_exercises(sport_id)
-    purposes = items.fetch_purposes(sport_type)
+    sports = workouts.fetch_sports()
+    sport_type = workouts.fetch_sport_type(sport_id)[0][0]
+    exercises = workouts.fetch_exercises(sport_id)
+    purposes = workouts.fetch_purposes(sport_type)
 
 
     for i in range(0,number_of_exercises):
@@ -190,12 +198,12 @@ def add_workout():
 
     #nämä muuttujat eivät ole tällä formilla.
     print("entered add workout function")    
-    sports = items.fetch_sports()
+    sports = workouts.fetch_sports()
     workout_id = str(uuid.uuid4())
     # sport_id = int(request.form["sport"])
-    sport_type = items.fetch_sport_type(sport_id)[0][0]
-    exercises = items.fetch_exercises(sport_id)
-    purposes = items.fetch_purposes(sport_type)
+    sport_type = workouts.fetch_sport_type(sport_id)[0][0]
+    exercises = workouts.fetch_exercises(sport_id)
+    purposes = workouts.fetch_purposes(sport_type)
 
     print("managed to fetch stuff but not times")    
 
@@ -210,7 +218,7 @@ def add_workout():
 
         if sport_type == "Endurance":
             print("entered endurance")
-            items.insert_workout(workout_id = workout_id, user_id = user_id, sport_id = sport_id, 
+            workouts.insert_workout(workout_id = workout_id, user_id = user_id, sport_id = sport_id, 
                                 begin_time=begin_time, end_time=end_time, comments=comments,
                                 exercise_id = exercise["exercise_id"], purpose_id = exercise["purpose_id"],
                                 minutes=exercise["minutes"], avghr = exercise["avghr"], 
@@ -219,7 +227,7 @@ def add_workout():
 
         if sport_type == "Strength":
             print("entered strength")
-            items.insert_workout(workout_id = workout_id, user_id = user_id, sport_id = sport_id, 
+            workouts.insert_workout(workout_id = workout_id, user_id = user_id, sport_id = sport_id, 
                                 begin_time=begin_time, end_time=end_time, comments=comments,
                                 exercise_id = exercise["exercise_id"], purpose_id = exercise["purpose_id"],
                                 sets=exercise["sets"], reps = exercise["reps"], weight = exercise["weight"],
