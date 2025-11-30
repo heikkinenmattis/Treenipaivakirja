@@ -27,7 +27,7 @@
 
   </select>
   <input type="submit" value="Confirm sport"/>
-  
+  <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
 </form>
 
 
@@ -160,7 +160,7 @@
 
   {% endfor %}
   <input type="submit" value="Confirm exercise"/>
-
+  <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
 </form>
 
 <form action="add_workout" method="post">
@@ -177,6 +177,7 @@
     <textarea name="comments" rows="5" cols="40"></textarea>
   </p>
   <input type="submit" value="Save workout"/>
+  <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
 </form>
 
 

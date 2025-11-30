@@ -83,6 +83,8 @@ def create():
 @app.route("/user_attributes.html")
 def user_attributes():
 
+    require_login()
+
     # To prefill forms, let's fetch existing user data first.
     user_id = session["user_id"]
     username = session["username"]
@@ -92,6 +94,9 @@ def user_attributes():
 
 @app.route("/add_user_data", methods=["POST"])
 def add_user_data():
+
+    require_login()
+    check_csrf()
 
     # Fetch user name. It is unique so it can be used in the building phase.
     session_username = session["username"]
@@ -112,17 +117,20 @@ def add_user_data():
                        weight = weight, height = height, 
                        max_heart_rate = max_heart_rate, ftp_cycling = ftp_cycling)
 
-    flash("Käyttäjädata päivitetty")        
+    flash("User data updated succesfully")        
     return redirect("/")
 
 
 @app.route("/workouts.html")
 def workouts_page():
+
+    require_login()
+
     sports = workouts.fetch_sports()
     return render_template("workouts.html", sports=sports, number_of_exercises=1, exercise_details={})
 
 sport_id = 1
-#Tämä näyttäis toimivan
+
 @app.route("/confirm_sport", methods=["POST"])
 def confirm_sport():
     sports = workouts.fetch_sports()
@@ -147,6 +155,9 @@ exercise_details = {}
 
 @app.route("/add_row", methods=["POST"])
 def add_row():
+
+    require_login()
+    check_csrf()
 
     global number_of_exercises
     global sport_id
@@ -188,6 +199,9 @@ def add_row():
  
 @app.route("/add_workout", methods=["POST"])
 def add_workout():
+
+    require_login()
+    check_csrf()
 
     global number_of_exercises
     global sport_id
@@ -277,6 +291,7 @@ def show_workout(workout_id):
 
 @app.route("/find_workout")
 def find_workout():
+
     query = request.args.get("query", "").strip()
     results = []
 
