@@ -5,21 +5,26 @@
 
 {% block content %}
 
-{% if not session.username %}
-<form action="/login" method="post">
-  <p>
-    Tunnus: <br />
-    <input type="text" name="username" />
-  </p>
-  <p>
-    Salasana: <br />
-    <input type="password" name="password" />
-  </p>
-  <input type="submit" value="Kirjaudu" />
-</form>
 
-<a href="./register.html"><p>Sign up!</p></a>
 
+
+{% if session.username %}
+
+<h2>Käyttäjien harjoitukset</h2>
+<ul>
+{% for workout in workouts %}
+<div class="workout">
+  <!--tää ei saa olla linkki-->
+<!--<a href="/workout/{{ workout.id }}">{{ workout.sport_name }}</a> <br /> -->
+<p>{{ workout.time_to_present }}</p>
+<p>Sport: {{ workout.sport_name }}</p>
+
+<!--Käyttäjä: <a href="/user/{{ workout.username }}">{{ workout.username }}</a> <br /> -->
+<p>User: {{ workout.username }}</p>
+
+</div>
+{% endfor %}
+</ul>
 {% endif %}
 
 {% endblock %}

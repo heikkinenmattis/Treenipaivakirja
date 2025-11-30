@@ -8,7 +8,9 @@ import secrets
 from flask import Flask
 from flask import redirect, render_template, request, flash, abort
 from flask import session
-from werkzeug.security import generate_password_hash, check_password_hash
+
+from datetime import datetime, timedelta
+
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -27,6 +29,29 @@ def check_csrf():
 @app.route("/")
 def index():
     all_workouts = workouts.get_workouts()
+
+    # for row in all_workouts:
+    #     print(f"ID: {row[0]}, UID: {row[1]}, USERNAME: {row[2]}, SPORTNAME: {row[3]}, BEGIN_TIME: {row[4]}, \
+    #             END_TIME: {row[5]}, SPORT_TYPE: {row[8]}, TYPEOF_DATES: {type(row[4])}, TIMEDIFF: {row[9]}")
+        
+        
+        
+
+        # How long was the workout?
+
+
+
+        # for stuff in row:
+        #     print(stuff)
+
+    # Actually the data that comes out is not workouts, but rather exercises. 
+    # Thus, either the query needs to be revised or data needs to be refactored
+    # in this function.
+
+    # Solution: alter the query.
+    # We need: User, sport, begin_time, duration in minutes, totalkilos if strength, kilometers if endurance
+
+
     return render_template("index.html", workouts=all_workouts)
 
 @app.route("/login", methods=["GET","POST"])

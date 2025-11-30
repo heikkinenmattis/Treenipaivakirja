@@ -56,26 +56,27 @@ def fetch_purposes(sport_type):
 
 
 def get_workouts():
-    sql = """   select  w.workout_id,
+    sql = """   select distinct         
+                        
+                        w.workout_id,
+                        w.user_id,
                         u.username, 
                         s.sport_name, 
-                        w.begin_time, 
-                        w.end_time,
-                        e.exercise_name,    
-                        p.purpose_name,
-                        w.sets,
-                        w.reps,
-                        w.weight,
-                        w.minutes,
-                        w.avg_hr,
-                        w.kilometers
+                        datetime(w.begin_time) as begin_time, 
+                        datetime(w.end_time) as end_time,
+                        case when s.sport_type = 'Strength' then sum(w.sets*w.reps*w.weight) else null end as total_kilograms,
+                        case when s.sport_type = 'Endurance' then sum(w.kilometers) else null end as kilometers,
+                        s.sport_type,
+                        timediff(w.end_time, w.begin_time) as duration,
+                        strftime('%d.%m.%Y', w.begin_time) as time_to_present
 
                 from workouts w
                 join sports s on w.sport_id = s.sport_id
                 join users u on w.user_id = u.id
                 join exercises e on w.exercise_id = e.exercise_id
                 join exercise_purposes p on w.purpose_id = p.purpose_id 
-                where 1 = ?
+                group by w.workout_id, u.username, s.sport_name, w.begin_time, w.end_time
                 """
 
-    return db.query(sql, [1])
+    return db.query(sql, [])
+
