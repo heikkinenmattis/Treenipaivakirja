@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block title %}User {{ user.username }}{% endblock %}
+
+{% block content %}
+<h2>User {{ user.username }}</h2>
+
+<div class="container_user">
+    <div class="box_user">
+        <p>Name: {{ user.first_name }} {{ user.last_name }}</p>
+        <p>City: {{ user.city }}</p>
+        <p>Favorite sport: {{ user.sport_name }}</p>
+    </div>
+    <div class="box_user">
+        <p>Height: {{ user.height }}</p>
+        <p>Weight: {{ user.weight }}</p>
+        <p>Date of birth: {{ user.date_of_birth }}</p>
+    </div>
+    <div class="box_user">
+        <p>Most common sport: {{ most_common_sport.sport_name }}, {{ most_common_sport.sport_count }} times</p>
+        <p>Most common exercise: {{ most_common_exercise.exercise_name }}, {{ most_common_exercise.exercise_count }} times</p>
+    </div>
+</div>
+
+
+<p>
+  The user has posted {{ user_workouts | count }} workouts.
+</p>
+<h3>Recent workouts</h3>
+<ul>
+
+  {% for workout in user_workouts %}
+    
+    <div class="workout">
+    <p>{{ workout.time_to_present }}</p>
+    <p>Begin time: {{ workout.begin_time }}</p>
+    <p>Sport: {{ workout.sport_name }}</p>
+    <p>Comments: {{ workout.comments }}</p>
+
+    </div>
+
+
+  {% endfor %}
+
+</ul>
+{% endblock %}

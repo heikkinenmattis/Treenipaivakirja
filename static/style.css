@@ -13,3 +13,24 @@ body {
   text-align: center;
   vertical-align: middle;
 }
+
+
+.container_user {
+    display: flex;
+    border: 2px solid black;
+    border-radius: 20px;
+    margin: 1em;
+    padding: 0.2em 0.5em;
+    text-align: left;
+    vertical-align: middle;
+}
+
+
+.box_user {
+    flex: 1;
+    margin: 15px;
+    padding: 0.2em 0.5em;
+    border: 2px solid slateblue;
+    text-align: left;
+    vertical-align: middle;
+}

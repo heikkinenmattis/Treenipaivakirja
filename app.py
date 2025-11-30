@@ -73,7 +73,7 @@ def login():
             session["csrf_token"] = secrets.token_hex(16)
             return redirect("/")
         else:
-            flash("VIRHE: väärä tunnus tai salasana")
+            flash("ERROR: Username or password not recognized")
             return redirect("/login")
 
 
@@ -90,16 +90,16 @@ def create():
     password1 = request.form["password1"]
     password2 = request.form["password2"]
     if password1 != password2:
-        flash("VIRHE: Salasanat eivät ole samat")        
+        flash("ERROR: The passwords don't match")        
         return render_template("register.html")
     
     try:
         users.create_user(username, password1)
     except sqlite3.IntegrityError:
-        flash("VIRHE: tunnus on jo varattu")        
+        flash("ERROR: User name already in use")        
         return render_template("register.html")
 
-    flash("Tunnus luotu")
+    flash("User registration succesful")
     return render_template("index.html")
 
 
@@ -269,6 +269,25 @@ def add_workout():
     return render_template("workouts.html", sports=sports, sport_type=sport_type,
                            exercises = exercises, purposes=purposes, sport_id=sport_id, 
                            number_of_exercises=number_of_exercises, exercise_details=exercise_details)
+
+
+
+@app.route("/user/<int:user_id>")
+def show_user(user_id):
+
+    user = users.fetch_userdata(user_id)[0]
+    if not user:
+        abort(404)
+    
+    most_common_sport = users.fetch_most_common_sport(user_id)[0]
+    most_common_exercise = users.fetch_most_common_exercise(user_id)[0]
+
+    user_workouts = users.fetch_user_workouts(user_id)
+    
+    return render_template("user_page.html", user=user, user_workouts=user_workouts,
+                           most_common_sport=most_common_sport, 
+                           most_common_exercise=most_common_exercise)
+
 
 
 

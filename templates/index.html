@@ -10,17 +10,16 @@
 
 {% if session.username %}
 
-<h2>Käyttäjien harjoitukset</h2>
+<h2>Recent workouts</h2>
 <ul>
 {% for workout in workouts %}
 <div class="workout">
-  <!--tää ei saa olla linkki-->
-<!--<a href="/workout/{{ workout.id }}">{{ workout.sport_name }}</a> <br /> -->
+
 <p>{{ workout.time_to_present }}</p>
 <p>Sport: {{ workout.sport_name }}</p>
 
-<!--Käyttäjä: <a href="/user/{{ workout.username }}">{{ workout.username }}</a> <br /> -->
-<p>User: {{ workout.username }}</p>
+User: <a href="/user/{{ workout.user_id }}">{{ workout.username }}</a> <br />
+
 
 </div>
 {% endfor %}

@@ -16,31 +16,31 @@
   {% if session.username %}
 
   <p>
-    Olet kirjautunut nimellä {{ session.username }}
+    You are logged in as user {{ session.username }}
   </p>
 
   <p>
-    <a href="/logout">Kirjaudu ulos</a>
-  </p>
-  <p>
-    <a href="/user_attributes.html">Käyttäjäasetukset</a>
+    <a href="/">Front page</a> |
+    <a href="/logout">Log out</a> |
+    <a href="/user_attributes.html">User settings</a> |
+    <a href="/workouts.html">Add workout</a>
   </p>		
 
   <p>
-    <a href="/workouts.html">Lisää harjoite</a>
+    
   </p>	
 
   {% else %}
   <form action="/login" method="post">
   <p>
-    Tunnus: <br />
+    User name: <br />
     <input type="text" name="username" />
   </p>
   <p>
-    Salasana: <br />
+    Password: <br />
     <input type="password" name="password" />
   </p>
-  <input type="submit" value="Kirjaudu" />
+  <input type="submit" value="Log in" />
   </form>
 
   <a href="./register.html"><p>Sign up!</p></a>

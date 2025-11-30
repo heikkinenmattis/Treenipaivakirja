@@ -76,6 +76,7 @@ def get_workouts():
                 join exercises e on w.exercise_id = e.exercise_id
                 join exercise_purposes p on w.purpose_id = p.purpose_id 
                 group by w.workout_id, u.username, s.sport_name, w.begin_time, w.end_time
+                order by datetime(w.begin_time) desc
                 """
 
     return db.query(sql, [])

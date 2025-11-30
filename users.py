@@ -53,12 +53,73 @@ def fetch_userdata(user_id):
                         u.ftp_cycling, 
                         u.fav_sport_id, 
                         s.sport_name, 
-                        c.city
+                        c.city,
+                        u.username
                 FROM users u 
                 LEFT JOIN sports s 
                     on u.fav_sport_id = s.sport_id
                 LEFT JOIN cities c
                     on u.city_id = c.city_id
                 WHERE u.id = ?"""
+
+    return db.query(sql, [user_id])
+
+
+def fetch_user_workouts(user_id):
+    sql = """select distinct         
+                        
+                        w.workout_id,
+                        w.user_id,
+                        u.username, 
+                        s.sport_name, 
+                        datetime(w.begin_time) as begin_time, 
+                        datetime(w.end_time) as end_time,
+                        case when s.sport_type = 'Strength' then sum(w.sets*w.reps*w.weight) else null end as total_kilograms,
+                        case when s.sport_type = 'Endurance' then sum(w.kilometers) else null end as kilometers,
+                        s.sport_type,
+                        timediff(w.end_time, w.begin_time) as duration,
+                        strftime('%d.%m.%Y', w.begin_time) as time_to_present,
+                        w.comments
+
+                from workouts w
+                join sports s on w.sport_id = s.sport_id
+                join users u on w.user_id = u.id
+                join exercises e on w.exercise_id = e.exercise_id
+                join exercise_purposes p on w.purpose_id = p.purpose_id
+                where u.id = ?
+                group by w.workout_id, u.username, s.sport_name, w.begin_time, w.end_time
+                order by datetime(w.begin_time) DESC """
+
+    return db.query(sql, [user_id])
+
+
+
+def fetch_most_common_sport(user_id):
+    # BUG: THIS RAISES THE MOST COMMON SPORT, BUT COUNTS IT BY EXERCISE, NOT
+    # SPORT. FIX
+    sql = """   SELECT  s.sport_name, 
+                        COUNT(distinct w.workout_id) as sport_count
+
+                FROM workouts w
+                JOIN sports s on w.sport_id = s.sport_id
+                WHERE w.user_id = ?
+                GROUP BY s.sport_name
+                ORDER BY sport_count DESC
+                LIMIT 1
+            """
+
+    return db.query(sql, [user_id])
+
+def fetch_most_common_exercise(user_id):
+    sql = """   SELECT  e.exercise_name, 
+                        COUNT(e.exercise_name) as exercise_count
+
+                FROM workouts w
+                JOIN exercises e on w.exercise_id = e.exercise_id
+                WHERE w.user_id = ?
+                GROUP BY e.exercise_name
+                ORDER BY exercise_count DESC
+                LIMIT 1
+            """
 
     return db.query(sql, [user_id])
