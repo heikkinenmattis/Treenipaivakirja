@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block title %}Find workouts{% endblock %}
+
+{% block content %}
+<h2>Find workouts</h2>
+
+<form action="/find_workout" method="get">
+  <p>
+    <label for="query">Search word</label>: <br />
+    <input type="text" name="query" id="query" value="{{ query }}"/>
+  </p>
+  
+  <input type="submit" value="Search" />
+</form>
+
+{% if query %}
+<h3>Results</h3>
+{% if results %}
+  <ul>
+    {% for workout in results %}
+      <li>
+        <a href="/workouts/{{ workout.workout_id }}"><strong>{{ workout.sport_name }}</strong></a><br>        
+        <small>{{ workout.begin_time }}</small>
+        <small>{{ workout.username }}</small>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No results for "{{ query }}"</p>
+{% endif %}
+{% endif %}
+
+<hr>
+
+<h3>Fetch all workouts</h3>
+<ul>
+  <li><a href="/">Fetch all</a></li>
+</ul>
+{% endblock %}

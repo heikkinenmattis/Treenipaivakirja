@@ -29,29 +29,6 @@ def check_csrf():
 @app.route("/")
 def index():
     all_workouts = workouts.get_workouts()
-
-    # for row in all_workouts:
-    #     print(f"ID: {row[0]}, UID: {row[1]}, USERNAME: {row[2]}, SPORTNAME: {row[3]}, BEGIN_TIME: {row[4]}, \
-    #             END_TIME: {row[5]}, SPORT_TYPE: {row[8]}, TYPEOF_DATES: {type(row[4])}, TIMEDIFF: {row[9]}")
-        
-        
-        
-
-        # How long was the workout?
-
-
-
-        # for stuff in row:
-        #     print(stuff)
-
-    # Actually the data that comes out is not workouts, but rather exercises. 
-    # Thus, either the query needs to be revised or data needs to be refactored
-    # in this function.
-
-    # Solution: alter the query.
-    # We need: User, sport, begin_time, duration in minutes, totalkilos if strength, kilometers if endurance
-
-
     return render_template("index.html", workouts=all_workouts)
 
 @app.route("/login", methods=["GET","POST"])
@@ -164,14 +141,6 @@ def confirm_sport():
                            number_of_exercises=1, exercise_details={})
 
 
-# Toimii, kun sport_id on globaalina muuttujana. Seuraavaksi
-# pitää tehdä sellainen jeccu, että muuttujat html-formilla on nimiluokkaa
-# sets_1, sets_2, sets_3 jne, jotta ne voi syöttää takaisin. Lisäksi tuo number of
-# exercises pitää palauttaa ykköseen heti kun workout on postattu.
-
-# Muutetaan tämä niin, että alustetaan tyhjä exercise_details kenttineen, joka työnnetään
-# html formille. Näin ei tarvitsisi joka kerta käydä formilta katsomassa, onko sanakirjassa tavaraa.
-# Lisätietoja esimerkiksi Obsidianista.
 
 number_of_exercises = 1
 exercise_details = {}
@@ -240,7 +209,7 @@ def add_workout():
     comments = request.form["comments"]
     user_id = session["user_id"]
 
-    #Tähän tulee joku for-looppi, jossa käydään hakemassa exercise_detailsista 
+
     for _, exercise in exercise_details.items():
 
 
@@ -264,8 +233,8 @@ def add_workout():
         
 
 
-    flash("Suoritus päivitetty")
-    # return redirect("/")
+    flash("Workout added succesfully")
+
     return render_template("workouts.html", sports=sports, sport_type=sport_type,
                            exercises = exercises, purposes=purposes, sport_id=sport_id, 
                            number_of_exercises=number_of_exercises, exercise_details=exercise_details)
@@ -288,6 +257,33 @@ def show_user(user_id):
                            most_common_sport=most_common_sport, 
                            most_common_exercise=most_common_exercise)
 
+
+
+@app.route("/workouts/<workout_id>")
+def show_workout(workout_id):
+
+
+    workout_data = workouts.fetch_workout_data(workout_id)
+    workout_sport = workout_data[0][0]
+    workout_user = workout_data[0][1]
+    workout_comment = workout_data[0][2]
+    workout_begin_time = workout_data[0][3]
+    workout_end_time = workout_data[0][4]
+
+    return render_template("workout_page.html", workout_data=workout_data, workout_sport=workout_sport,
+                           workout_user=workout_user, workout_comment=workout_comment, workout_begin_time=workout_begin_time,
+                           workout_end_time=workout_end_time)
+
+
+@app.route("/find_workout")
+def find_workout():
+    query = request.args.get("query", "").strip()
+    results = []
+
+    if query:
+        results = workouts.search_workouts(query)
+
+    return render_template("find_workout.html", query=query, results=results)
 
 
 

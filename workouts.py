@@ -81,3 +81,56 @@ def get_workouts():
 
     return db.query(sql, [])
 
+
+
+def fetch_workout_data(workout_id):
+    sql = """   select  s.sport_name,
+                        u.username,
+                        w.comments,
+                        strftime('%d.%m.%Y %H:%M', w.begin_time) as begin_time,
+                        strftime('%d.%m.%Y %H:%M', w.end_time) as end_time,
+                        s.sport_type,
+                        e.exercise_name,
+                        p.purpose_name,
+                        w.sets,
+                        w.reps,
+                        w.weight,
+                        w.avg_hr,
+                        w.minutes,
+                        w.kilometers
+
+                from workouts w
+                join exercises e on w.exercise_id = e.exercise_id
+                join sports s on w.sport_id = s.sport_id
+                join users u on w.user_id = u.id
+                join exercise_purposes p on w.purpose_id = p.purpose_id 
+                where w.workout_id = ?
+                order by datetime(w.begin_time) desc
+
+            """
+
+    return db.query(sql, [workout_id])
+
+
+
+def search_workouts(query):
+    sql = """   select distinct
+
+                        w.workout_id,
+                        s.sport_name,
+                        u.username,
+                        w.comments,
+                        strftime('%d.%m.%Y %H:%M', w.begin_time) as begin_time,
+                        strftime('%d.%m.%Y %H:%M', w.end_time) as end_time
+                        
+                from workouts w
+                join exercises e on w.exercise_id = e.exercise_id
+                join sports s on w.sport_id = s.sport_id
+                join users u on w.user_id = u.id
+                join exercise_purposes p on w.purpose_id = p.purpose_id 
+                where lower(s.sport_name) LIKE ? or lower(e.exercise_name) LIKE ?
+                """
+    
+    search_word = f"%{query}%"
+
+    return db.query(sql, [search_word, search_word])

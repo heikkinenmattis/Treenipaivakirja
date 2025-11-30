@@ -95,8 +95,7 @@ def fetch_user_workouts(user_id):
 
 
 def fetch_most_common_sport(user_id):
-    # BUG: THIS RAISES THE MOST COMMON SPORT, BUT COUNTS IT BY EXERCISE, NOT
-    # SPORT. FIX
+
     sql = """   SELECT  s.sport_name, 
                         COUNT(distinct w.workout_id) as sport_count
 

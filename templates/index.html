@@ -15,7 +15,8 @@
 {% for workout in workouts %}
 <div class="workout">
 
-<p>{{ workout.time_to_present }}</p>
+<p></p>
+<a href="/workouts/{{ workout.workout_id }}">{{ workout.time_to_present }}</a> <br />
 <p>Sport: {{ workout.sport_name }}</p>
 
 User: <a href="/user/{{ workout.user_id }}">{{ workout.username }}</a> <br />

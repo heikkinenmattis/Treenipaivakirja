@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+
+{% block title %}{{ workout_sport }}{% endblock %}
+
+{% block content %}
+<h2>Workout: {{ workout_sport }}</h2>
+
+<div class="container_user">
+    <div class="box_user">
+        <p>Sport: {{ workout_sport }}</p>
+        <p>Begin time: {{ workout_begin_time }}</p>
+        <p>End time: {{ workout_end_time }}</p>
+    </div>
+    <div class="box_user">
+        <p>Athlete: {{ workout_user }}</p>
+        <p>Athlete comment: {{ workout_comment }}</p>
+    </div>
+</div>
+
+<p>
+  The workout consisted of {{ workout_data | count }} exercises.
+</p>
+<h3>Exercises in workout</h3>
+<ul>
+
+  {% for exercise in workout_data %}
+    
+    <div class="workout">
+    <p>{{ exercise.exercise_name }}</p>
+    {% if exercise.sport_type == "Strength" %}
+    <p>Purpose: {{ exercise.purpose_name }}</p>
+    <p>Sets: {{ exercise.sets }}</p>
+    <p>Reps: {{ exercise.reps }}</p>
+    <p>Weight: {{ exercise.weight }}</p>
+    {% else %}
+    <p>Purpose: {{ exercise.purpose_name }}</p>
+    <p>Average heart rate: {{ exercise.avg_hr }}</p>
+    <p>Minutes: {{ exercise.minutes }}</p>
+    <p>Kilometers: {{ exercise.kilometers }}</p>
+    {% endif %}
+    </div>
+
+
+  {% endfor %}
+
+</ul>
+
+
+
+
+{% endblock %}
