@@ -6,30 +6,39 @@
 {% block content %}
 
 {{ session.sport_id }}
-<form action="/confirm_sport" method="post">
-  
-  <label for="sport">Choose a sport:</label>
+<div class="container_buttons">
+  <div class="box_buttons">
+    <form action="/confirm_sport" method="post">
+    
+    <label for="sport">Choose a sport:</label>
 
-  <select name="sport" id="sport">
-  
-  {% for sport in sports %}
-    {% if not sport_id %} 
-      <option value="{{ sport.sport_id }}">{{ sport.sport_name }}</option>
-    {% else %}
-      {% if sport_id == sport.sport_id %}
-        <option value="{{ sport.sport_id }}" selected>{{ sport.sport_name }}</option>
-      {% else %}
+    <select name="sport" id="sport">
+    
+    {% for sport in sports %}
+      {% if not sport_id %} 
         <option value="{{ sport.sport_id }}">{{ sport.sport_name }}</option>
+      {% else %}
+        {% if sport_id == sport.sport_id %}
+          <option value="{{ sport.sport_id }}" selected>{{ sport.sport_name }}</option>
+        {% else %}
+          <option value="{{ sport.sport_id }}">{{ sport.sport_name }}</option>
+        {% endif %}
       {% endif %}
-    {% endif %}
-  {% endfor %}
-  
+    {% endfor %}
+    
 
-  </select>
-  <input type="submit" value="Confirm sport"/>
-  <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
-</form>
+    </select>
+    <input type="submit" value="Confirm sport"/>
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+  </form>
+  </div>
 
+  <div class="box_buttons">
+    <form action="/reset_workout" method="post">
+      <input type="submit" value="Reset workout"/>
+    </form>
+  </div>
+</div>
 
 <form form action="/add_row" method="post">
 

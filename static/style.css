@@ -34,3 +34,15 @@ body {
     text-align: left;
     vertical-align: middle;
 }
+
+
+.container_buttons {
+    display: flex;
+    text-align: left;
+}
+
+
+.box_buttons {
+    border: 2px solid slateblue;
+    text-align: left;
+}

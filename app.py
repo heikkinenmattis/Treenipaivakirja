@@ -261,9 +261,10 @@ def add_workout():
 
 
 
-# @app.route("/reset_workout")
-# def reset_workout():
-#     pass
+@app.route("/reset_workout", methods=["POST"])
+def reset_workout():
+    return workouts_page()
+
 
 @app.route("/user/<int:user_id>")
 def show_user(user_id):
