@@ -9,8 +9,6 @@ from flask import Flask
 from flask import redirect, render_template, request, flash, abort
 from flask import session
 
-from datetime import datetime, timedelta
-
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -87,7 +85,6 @@ def user_attributes():
 
     # To prefill forms, let's fetch existing user data first.
     user_id = session["user_id"]
-    username = session["username"]
     userdata = users.fetch_userdata(user_id)[0]
 
     return render_template("user_attributes.html", userdata=userdata)
@@ -126,32 +123,38 @@ def workouts_page():
 
     require_login()
 
-    sports = workouts.fetch_sports()
-    return render_template("workouts.html", sports=sports, number_of_exercises=1, exercise_details={})
+    session.pop("sport_id", None)
+    session.pop("exercise_details", None)
+    session.pop("number_of_exercises", None)
 
-sport_id = 1
+    session["sport_id"] = 1
+    session["number_of_exercises"] = 0
+    session["exercise_details"] = {}
+
+    sports = workouts.fetch_sports()
+    return render_template("workouts.html", sports=sports, number_of_exercises=session["number_of_exercises"], exercise_details=session["exercise_details"])
+
 
 @app.route("/confirm_sport", methods=["POST"])
 def confirm_sport():
     sports = workouts.fetch_sports()
     
-    global sport_id
-
-    sport_id = int(request.form["sport"])
+    session["sport_id"] = int(request.form["sport"])
     
-    sport_type = workouts.fetch_sport_type(sport_id)[0][0]
-    exercises = workouts.fetch_exercises(sport_id)
+    details = session.get("exercise_details", {})
+    n = session.get("number_of_exercises", 0)
+
+
+    sport_type = workouts.fetch_sport_type(session["sport_id"])[0][0]
+    exercises = workouts.fetch_exercises(session["sport_id"])
     purposes = workouts.fetch_purposes(sport_type)
 
-
+    flash("Sport confirmed succesfully")
     return render_template("workouts.html", sports=sports, sport_type=sport_type,
-                           exercises = exercises, purposes=purposes, sport_id=sport_id, 
-                           number_of_exercises=1, exercise_details={})
+                           exercises = exercises, purposes=purposes, sport_id=session["sport_id"], 
+                           number_of_exercises=n, exercise_details=details)
 
 
-
-number_of_exercises = 1
-exercise_details = {}
 
 @app.route("/add_row", methods=["POST"])
 def add_row():
@@ -159,41 +162,43 @@ def add_row():
     require_login()
     check_csrf()
 
-    global number_of_exercises
-    global sport_id
-    global exercise_details
-
     sports = workouts.fetch_sports()
-    sport_type = workouts.fetch_sport_type(sport_id)[0][0]
-    exercises = workouts.fetch_exercises(sport_id)
+    sport_type = workouts.fetch_sport_type(session["sport_id"])[0][0]
+    exercises = workouts.fetch_exercises(session["sport_id"])
     purposes = workouts.fetch_purposes(sport_type)
 
+    details = session.get("exercise_details", {})
+    n = session.get("number_of_exercises", 0)
 
-    for i in range(0,number_of_exercises):
+    for i in range(0,n):
         print(f"entered for loop for EVERYTHING, iteration round{i}")
-        exercise_details[i] = {}
         
-        exercise_details[i]["exercise_id"] = int(request.form[f"exercise_{i}"])
-        exercise_details[i]["purpose_id"] = int(request.form[f"purpose_{i}"])
+        key = str(i)
+        details[key] = {} 
+        
+        details[key]["exercise_id"] = int(request.form[f"exercise_{i}"])
+        details[key]["purpose_id"] = int(request.form[f"purpose_{i}"])
 
         if sport_type == "Endurance":
-            exercise_details[i]["minutes"] = request.form[f"minutes_{i}"]
-            exercise_details[i]["avghr"] = request.form[f"avghr_{i}"]
-            exercise_details[i]["kilometers"] = request.form[f"kilometers_{i}"]
+            details[key]["minutes"] = request.form[f"minutes_{i}"]
+            details[key]["avghr"] = request.form[f"avghr_{i}"]
+            details[key]["kilometers"] = request.form[f"kilometers_{i}"]
 
         if sport_type == "Strength":
-            exercise_details[i]["sets"] = request.form[f"sets_{i}"]
-            exercise_details[i]["reps"] = request.form[f"reps_{i}"]
-            exercise_details[i]["weight"] = request.form[f"weight_{i}"]
+            details[key]["sets"] = request.form[f"sets_{i}"]
+            details[key]["reps"] = request.form[f"reps_{i}"]
+            details[key]["weight"] = request.form[f"weight_{i}"]
 
-    print(exercise_details)
+    print(details)
 
-    number_of_exercises += 1
+    session["exercise_details"] = details
+    n += 1
+    session["number_of_exercises"] = n
 
 
     return render_template("workouts.html", sports=sports, sport_type=sport_type,
-                           exercises = exercises, purposes=purposes, sport_id=sport_id, 
-                           number_of_exercises=number_of_exercises, exercise_details=exercise_details)
+                           exercises = exercises, purposes=purposes, sport_id=session["sport_id"], 
+                           number_of_exercises=n, exercise_details=details)
 
 
  
@@ -203,17 +208,12 @@ def add_workout():
     require_login()
     check_csrf()
 
-    global number_of_exercises
-    global sport_id
-    global exercise_details
+    spid = int(session.get("sport_id", 1))
 
-    #nämä muuttujat eivät ole tällä formilla.
-    print("entered add workout function")    
     sports = workouts.fetch_sports()
     workout_id = str(uuid.uuid4())
-    # sport_id = int(request.form["sport"])
-    sport_type = workouts.fetch_sport_type(sport_id)[0][0]
-    exercises = workouts.fetch_exercises(sport_id)
+    sport_type = workouts.fetch_sport_type(spid)[0][0]
+    exercises = workouts.fetch_exercises(spid)
     purposes = workouts.fetch_purposes(sport_type)
 
     print("managed to fetch stuff but not times")    
@@ -223,13 +223,15 @@ def add_workout():
     comments = request.form["comments"]
     user_id = session["user_id"]
 
+    details = session.get("exercise_details", {})
+    n = session.get("number_of_exercises", 0)
 
-    for _, exercise in exercise_details.items():
+    for _, exercise in details.items():
 
 
         if sport_type == "Endurance":
             print("entered endurance")
-            workouts.insert_workout(workout_id = workout_id, user_id = user_id, sport_id = sport_id, 
+            workouts.insert_workout(workout_id = workout_id, user_id = user_id, sport_id = session["sport_id"], 
                                 begin_time=begin_time, end_time=end_time, comments=comments,
                                 exercise_id = exercise["exercise_id"], purpose_id = exercise["purpose_id"],
                                 minutes=exercise["minutes"], avghr = exercise["avghr"], 
@@ -238,7 +240,7 @@ def add_workout():
 
         if sport_type == "Strength":
             print("entered strength")
-            workouts.insert_workout(workout_id = workout_id, user_id = user_id, sport_id = sport_id, 
+            workouts.insert_workout(workout_id = workout_id, user_id = user_id, sport_id = session["sport_id"], 
                                 begin_time=begin_time, end_time=end_time, comments=comments,
                                 exercise_id = exercise["exercise_id"], purpose_id = exercise["purpose_id"],
                                 sets=exercise["sets"], reps = exercise["reps"], weight = exercise["weight"],
@@ -248,10 +250,13 @@ def add_workout():
 
 
     flash("Workout added succesfully")
+    session.pop("sport_id", None)
+    session.pop("exercise_details", None)
+    session.pop("number_of_exercises", None)
 
     return render_template("workouts.html", sports=sports, sport_type=sport_type,
-                           exercises = exercises, purposes=purposes, sport_id=sport_id, 
-                           number_of_exercises=number_of_exercises, exercise_details=exercise_details)
+                           exercises = exercises, purposes=purposes, sport_id=spid, 
+                           number_of_exercises=n, exercise_details=details)
 
 
 

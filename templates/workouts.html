@@ -5,7 +5,7 @@
 
 {% block content %}
 
-
+{{ session.sport_id }}
 <form action="/confirm_sport" method="post">
   
   <label for="sport">Choose a sport:</label>
@@ -35,14 +35,14 @@
 
   {% for i in range(0, number_of_exercises) %}
 
-      {% if exercise_details[i] %}
+      {% if exercise_details[i|string] %}
 
         <!--Tähän nyt sitten kylelle nuo nimet oikein.-->
         <label for="{{ "exercise_" ~ i }}">Choose an exercise:</label> 
         <select name="{{ "exercise_" ~ i }}" id="{{ "exercise_" ~ i }}">
 
         {% for exercise in exercises %}
-          {% if exercise_details[i]["exercise_id"] == exercise.exercise_id %} 
+          {% if exercise_details[i|string]["exercise_id"] == exercise.exercise_id %} 
             <option value="{{ exercise.exercise_id }}" selected>{{ exercise.exercise_name }}</option>
           {% else %}
             <option value="{{ exercise.exercise_id }}">{{ exercise.exercise_name }}</option>
@@ -54,7 +54,7 @@
         <select name="{{ "purpose_" ~ i }}" id="{{ "purpose_" ~ i }}">
 
         {% for purpose in purposes %} 
-          {% if exercise_details[i]["purpose_id"] == purpose.purpose_id %} 
+          {% if exercise_details[i|string]["purpose_id"] == purpose.purpose_id %} 
             <option value="{{ purpose.purpose_id }}" selected>{{ purpose.purpose_name }}</option>
           {% else %}
             <option value="{{ purpose.purpose_id }}">{{ purpose.purpose_name }}</option>
@@ -81,38 +81,38 @@
       {% endif %}
 
     {% if sport_type %}
-      {% if exercise_details[i] %}
+      {% if exercise_details[i|string] %}
         {% if sport_type == "Strength" %}
         
           <p>
             Sets: <br />
-            <input type="number" name="{{ "sets_" ~ i }}" value="{{ exercise_details[i]["sets"] }}"/>
+            <input type="number" name="{{ "sets_" ~ i }}" value="{{ exercise_details[i|string]["sets"] }}"/>
           </p>
 
           <p>
             Reps: <br />
-            <input type="number" name="{{ "reps_" ~ i }}" value="{{ exercise_details[i]["reps"] }}"/>
+            <input type="number" name="{{ "reps_" ~ i }}" value="{{ exercise_details[i|string]["reps"] }}"/>
           </p>
 
           <p>
             Weight: <br />
-            <input type="number" name="{{ "weight_" ~ i }}" value="{{ exercise_details[i]["weight"] }}"/>
+            <input type="number" name="{{ "weight_" ~ i }}" value="{{ exercise_details[i|string]["weight"] }}"/>
           </p>
 
         {% else %}
           <p>
             Minutes: <br />
-            <input type="number" name="{{ "minutes_" ~ i }}" value="{{ exercise_details[i]["minutes"] }}"/>
+            <input type="number" name="{{ "minutes_" ~ i }}" value="{{ exercise_details[i|string]["minutes"] }}"/>
           </p>
 
           <p>
             Average hr: <br />
-            <input type="number" name="{{ "avghr_" ~ i }}" value="{{ exercise_details[i]["avghr"] }}"/>
+            <input type="number" name="{{ "avghr_" ~ i }}" value="{{ exercise_details[i|string]["avghr"] }}"/>
           </p>
 
           <p>
             Kilometers: <br />
-            <input type="number" name="{{ "kilometers_" ~ i }}" value="{{ exercise_details[i]["kilometers"] }}"/>
+            <input type="number" name="{{ "kilometers_" ~ i }}" value="{{ exercise_details[i|string]["kilometers"] }}"/>
           </p>
 
         {% endif %}
@@ -159,7 +159,11 @@
     {% endif %}
 
   {% endfor %}
-  <input type="submit" value="Confirm exercise"/>
+  {% if number_of_exercises == 0%}
+    <input type="submit" value="Add exercise"/>
+  {% else %}
+    <input type="submit" value="Confirm exercise"/>
+  {% endif %}
   <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
 </form>
 
