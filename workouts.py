@@ -134,3 +134,28 @@ def search_workouts(query):
     search_word = f"%{query}%"
 
     return db.query(sql, [search_word, search_word])
+
+
+
+def comment_workout(user_id, workout_id, timestamp, content):
+    sql = """   insert into comments (user_id, workout_id, timestamp, content)
+                    values (?,?,?,?)
+                """
+    db.execute(sql, [user_id, workout_id, timestamp, content])
+
+
+
+def fetch_comments(workout_id):
+    sql = """   select  c.user_id,
+                        u.username,
+                        c.workout_id,
+                        strftime('%d.%m.%Y %H:%M', c.timestamp) as timestamp,
+                        c.content
+
+                from comments c
+                join users u on c.user_id = u.id
+                where c.workout_id = ?
+                order by datetime(c.timestamp) desc
+                """
+    
+    return db.query(sql, [workout_id])

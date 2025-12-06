@@ -74,7 +74,7 @@ create table cities (
 create table comments (
 	id INTEGER PRIMARY KEY,
 	user_id INTEGER REFERENCES users(id),
-	workout_id TEXT REFERENCES workouts(workout_id),
+	workout_id TEXT,
 	timestamp TEXT,
 	content TEXT
 );

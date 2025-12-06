@@ -9,6 +9,7 @@ from flask import Flask
 from flask import redirect, render_template, request, flash, abort
 from flask import session
 
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -295,9 +296,39 @@ def show_workout(workout_id):
     workout_begin_time = workout_data[0][3]
     workout_end_time = workout_data[0][4]
 
+    previous_comments = workouts.fetch_comments(workout_id)
+    for i in previous_comments:
+        print(i)
+
+
     return render_template("workout_page.html", workout_data=workout_data, workout_sport=workout_sport,
                            workout_user=workout_user, workout_comment=workout_comment, workout_begin_time=workout_begin_time,
-                           workout_end_time=workout_end_time)
+                           workout_end_time=workout_end_time, workout_id=workout_id, previous_comments=previous_comments)
+
+
+@app.route("/add_comment", methods=["POST"])
+def add_comment():
+
+    require_login()
+    check_csrf()
+
+    workout_id = request.form["workout_id"]
+    comment_content = request.form["comment_content"]
+    comment_timestamp = str(datetime.now())
+
+    workout_data = workouts.fetch_workout_data(workout_id)
+    workout_sport = workout_data[0][0]
+    workout_user = workout_data[0][1]
+    workout_comment = workout_data[0][2]
+    workout_begin_time = workout_data[0][3]
+    workout_end_time = workout_data[0][4]
+
+    previous_comments = workouts.fetch_comments(workout_id)
+    
+    workouts.comment_workout(user_id=session["user_id"], workout_id=workout_id, timestamp=comment_timestamp, content=comment_content)
+    flash("Comment added succesfully")
+
+    return show_workout(workout_id=workout_id)
 
 
 @app.route("/find_workout")

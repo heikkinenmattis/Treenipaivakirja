@@ -27,18 +27,18 @@
   {% for exercise in workout_data %}
     
     <div class="workout">
-    <p>{{ exercise.exercise_name }}</p>
-    {% if exercise.sport_type == "Strength" %}
-    <p>Purpose: {{ exercise.purpose_name }}</p>
-    <p>Sets: {{ exercise.sets }}</p>
-    <p>Reps: {{ exercise.reps }}</p>
-    <p>Weight: {{ exercise.weight }}</p>
-    {% else %}
-    <p>Purpose: {{ exercise.purpose_name }}</p>
-    <p>Average heart rate: {{ exercise.avg_hr }}</p>
-    <p>Minutes: {{ exercise.minutes }}</p>
-    <p>Kilometers: {{ exercise.kilometers }}</p>
-    {% endif %}
+      <p>{{ exercise.exercise_name }}</p>
+      {% if exercise.sport_type == "Strength" %}
+        <p>Purpose: {{ exercise.purpose_name }}</p>
+        <p>Sets: {{ exercise.sets }}</p>
+        <p>Reps: {{ exercise.reps }}</p>
+        <p>Weight: {{ exercise.weight }}</p>
+      {% else %}
+        <p>Purpose: {{ exercise.purpose_name }}</p>
+        <p>Average heart rate: {{ exercise.avg_hr }}</p>
+        <p>Minutes: {{ exercise.minutes }}</p>
+        <p>Kilometers: {{ exercise.kilometers }}</p>
+      {% endif %}
     </div>
 
 
@@ -48,5 +48,32 @@
 
 
 
+<h4>Comments related to this workout</h4>
+
+<ul>
+{% if previous_comments %}
+  {% for comment in previous_comments %}
+    
+    <li>
+      <strong>{{ comment.username }}</strong> at {{ comment.timestamp }}<br>
+        <ul>
+          <li><p>{{ comment.content }}</p></li>
+        </ul>
+    </li>
+
+  {% endfor %}
+{% endif %}
+</ul>
+
+
+<form action="/add_comment" method="post">
+  <p>
+    Comment workout: <br />
+    <textarea name="comment_content" rows="5" cols="40"></textarea>
+  </p>
+  <input type="submit" value="Add comment"/>
+  <input type="hidden" name="workout_id" value="{{ workout_id }}" />
+  <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+</form>
 
 {% endblock %}
