@@ -260,6 +260,11 @@ def add_workout():
 
 
 
+
+# @app.route("/reset_workout")
+# def reset_workout():
+#     pass
+
 @app.route("/user/<int:user_id>")
 def show_user(user_id):
 
