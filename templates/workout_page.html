@@ -13,7 +13,7 @@
         <p>End time: {{ workout_end_time }}</p>
     </div>
     <div class="box_user">
-        <p>Athlete: {{ workout_user }}</p>
+        <p>Athlete: <a href="/user/{{ workout_user_id }}">{{ workout_user }}</a></p>
         <p>Athlete comment: {{ workout_comment }}</p>
     </div>
 </div>
@@ -55,7 +55,7 @@
   {% for comment in previous_comments %}
     
     <li>
-      <strong>{{ comment.username }}</strong> at {{ comment.timestamp }}<br>
+      <strong><a href="/user/{{ comment.user_id }}">{{ comment.username }}</a></strong> at {{ comment.timestamp }}<br>
         <ul>
           <li><p>{{ comment.content }}</p></li>
         </ul>

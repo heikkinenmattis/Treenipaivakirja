@@ -97,7 +97,9 @@ def fetch_workout_data(workout_id):
                         w.weight,
                         w.avg_hr,
                         w.minutes,
-                        w.kilometers
+                        w.kilometers,
+                        u.id,
+                        w.workout_id
 
                 from workouts w
                 join exercises e on w.exercise_id = e.exercise_id
