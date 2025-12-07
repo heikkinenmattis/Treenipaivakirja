@@ -15,6 +15,13 @@
     <div class="box_user">
         <p>Athlete: <a href="/user/{{ workout_user_id }}">{{ workout_user }}</a></p>
         <p>Athlete comment: {{ workout_comment }}</p>
+        {% if session.username == workout_user %}
+          <form action="/delete_workout" method="post">
+            <input type="hidden" name="workout_id" value="{{ workout_id }}" />
+            <input type="hidden" name="source_page" value="workout_page.html" />
+            <input type="submit" value="Delete workout"/>
+          </form>
+        {% endif %}
     </div>
 </div>
 

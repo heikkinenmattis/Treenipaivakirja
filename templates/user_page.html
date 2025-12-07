@@ -37,6 +37,18 @@
     <p>Sport: {{ workout.sport_name }}</p>
     <p>Comments: {{ workout.comments }}</p>
 
+    {% if session.username == workout.username %}
+        <p>
+        <form action="/delete_workout" method="post">
+            <input type="submit" value="Delete workout"/>
+            <input type="hidden" name="workout_id" value="{{ workout.workout_id }}" />
+            <input type="hidden" name="source_page" value="user_page.html" />
+            <input type="hidden" name="user_id" value="{{ workout.user_id }}" />     
+        </form>
+        </p>
+    {% else %}
+    {% endif %}
+
     </div>
 
 

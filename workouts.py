@@ -161,3 +161,9 @@ def fetch_comments(workout_id):
                 """
     
     return db.query(sql, [workout_id])
+
+
+def delete_workout(workout_id):
+    sql = """   delete from workouts where workout_id = ?
+                """
+    db.execute(sql, [workout_id])

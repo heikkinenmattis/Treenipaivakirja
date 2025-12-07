@@ -336,6 +336,22 @@ def find_workout():
     return render_template("find_workout.html", query=query, results=results)
 
 
+@app.route("/delete_workout", methods=["POST"])
+def delete_workout():
+    
+    workout_id = request.form["workout_id"]
+    source_page = request.form["source_page"]
+    
+    if source_page == "user_page.html":
+        user_id = request.form["user_id"]
+        workouts.delete_workout(workout_id)
+        return show_user(user_id=user_id)
+
+    #täältä ei vielä pysty poistaan
+    if source_page == "workout_page.html":
+        workouts.delete_workout(workout_id)
+        return redirect("/")
+
 
 @app.route("/logout")
 def logout():
