@@ -1,51 +1,17 @@
 
 {% extends "layout.html" %}
 
-{% block title %}Add workout{% endblock %}
+{% block title %}Edit workout{% endblock %}
 
 {% block content %}
 
-<div class="container_buttons">
-  <div class="box_buttons">
-    <form action="/confirm_sport" method="post">
-    
-    <label for="sport">Choose a sport:</label>
 
-    <select name="sport" id="sport">
-    
-    {% for sport in sports %}
-      {% if not sport_id %} 
-        <option value="{{ sport.sport_id }}">{{ sport.sport_name }}</option>
-      {% else %}
-        {% if sport_id == sport.sport_id %}
-          <option value="{{ sport.sport_id }}" selected>{{ sport.sport_name }}</option>
-        {% else %}
-          <option value="{{ sport.sport_id }}">{{ sport.sport_name }}</option>
-        {% endif %}
-      {% endif %}
-    {% endfor %}
-    
-
-    </select>
-    <input type="submit" value="Confirm sport"/>
-    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
-  </form>
-  </div>
-
-  <div class="box_buttons">
-    <form action="/reset_workout" method="post">
-      <input type="submit" value="Reset workout"/>
-    </form>
-  </div>
-</div>
-
-<form form action="/add_workout" method="post">
+<form action="/edit_workout" method="post">
 
   {% for i in range(0, number_of_exercises) %}
 
       {% if exercise_details[i|string] %}
 
-        <!--Tähän nyt sitten kylelle nuo nimet oikein.-->
         <label for="{{ "exercise_" ~ i }}">Choose an exercise:</label> 
         <select name="{{ "exercise_" ~ i }}" id="{{ "exercise_" ~ i }}">
 
@@ -167,22 +133,26 @@
     {% endif %}
 
   {% endfor %}
+
   <p>
     Begin time: <br />
-    <input type="datetime-local" name="begin_time" value="{{ begin_time }}" />
+    <input type="datetime-local" name="begin_time" value="{{ begin_time }}" /> <!-- REQUIRED--->
   </p>
   <p>
     End time: <br />
-    <input type="datetime-local" name="end_time" value="{{ end_time }}" />
+    <input type="datetime-local" name="end_time" value="{{ end_time }}" /> <!-- REQUIRED--->
   </p>
   <p>
     Athlete comment: <br />
     <textarea name="comments" rows="5" cols="40">{{ athlete_comment }}</textarea>
   </p>
+  
   <button name="button_action" value="add_exercise">Add exercise</button>    
   <button name="button_action" value="save_workout">Save workout</button>
   <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+  <input type="hidden" name="workout_id" value="{{ workout_id }}">
+  <input type="hidden" name="sport_id" value="{{ sport_id }}">
+  <input type="hidden" name="source_page" value="edit_workout.html" />
 </form>
-
 
 {% endblock %}

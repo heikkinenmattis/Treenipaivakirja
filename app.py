@@ -158,8 +158,10 @@ def confirm_sport():
 
 
 
-@app.route("/add_row", methods=["POST"])
-def add_row():
+@app.route("/add_workout", methods=["POST"])
+def add_workout():
+
+    action = request.form["button_action"]
 
     require_login()
     check_csrf()
@@ -190,74 +192,54 @@ def add_row():
             details[key]["reps"] = request.form[f"reps_{i}"]
             details[key]["weight"] = request.form[f"weight_{i}"]
 
-    print(details)
-
-    session["exercise_details"] = details
-    n += 1
-    session["number_of_exercises"] = n
-
-
-    return render_template("workouts.html", sports=sports, sport_type=sport_type,
-                           exercises=exercises, purposes=purposes, sport_id=session["sport_id"], 
-                           number_of_exercises=n, exercise_details=details)
-
-
- 
-@app.route("/add_workout", methods=["POST"])
-def add_workout():
-
-    require_login()
-    check_csrf()
-
-    spid = int(session.get("sport_id", 1))
-
-    sports = workouts.fetch_sports()
-    workout_id = str(uuid.uuid4())
-    sport_type = workouts.fetch_sport_type(spid)[0][0]
-    exercises = workouts.fetch_exercises(spid)
-    purposes = workouts.fetch_purposes(sport_type)
-
-    print("managed to fetch stuff but not times")    
 
     begin_time = request.form["begin_time"]
     end_time = request.form["end_time"]
     comments = request.form["comments"]
     user_id = session["user_id"]
 
-    details = session.get("exercise_details", {})
-    n = session.get("number_of_exercises", 0)
 
-    for _, exercise in details.items():
+    if action == "add_exercise":
 
+        session["exercise_details"] = details
+        n += 1
+        session["number_of_exercises"] = n
 
-        if sport_type == "Endurance":
-            print("entered endurance")
-            workouts.insert_workout(workout_id=workout_id, user_id=user_id, sport_id=session["sport_id"], 
-                                begin_time=begin_time, end_time=end_time, comments=comments,
-                                exercise_id=exercise["exercise_id"], purpose_id=exercise["purpose_id"],
-                                minutes=exercise["minutes"], avghr=exercise["avghr"], 
-                                kilometers=exercise["kilometers"], sets=None, reps=None, weight=None)
+        return render_template("workouts.html", sports=sports, sport_type=sport_type,
+                            exercises=exercises, purposes=purposes, sport_id=session["sport_id"], 
+                            number_of_exercises=n, exercise_details=details,begin_time=begin_time,
+                            end_time=end_time, athlete_comment=comments)
+    
+    
+    if action == "save_workout":
 
+        workout_id = str(uuid.uuid4())
+        spid = session["sport_id"]
 
-        if sport_type == "Strength":
-            print("entered strength")
-            workouts.insert_workout(workout_id=workout_id, user_id=user_id, sport_id=session["sport_id"], 
-                                begin_time=begin_time, end_time=end_time, comments=comments,
-                                exercise_id=exercise["exercise_id"], purpose_id=exercise["purpose_id"],
-                                sets=exercise["sets"], reps=exercise["reps"], weight=exercise["weight"],
-                                minutes=None, avghr=None, kilometers=None)
-            
-        
+        for _, exercise in details.items():
 
+            if sport_type == "Endurance":
+                workouts.insert_workout(workout_id=workout_id, user_id=user_id, sport_id=spid, 
+                                    begin_time=begin_time, end_time=end_time, comments=comments,
+                                    exercise_id=exercise["exercise_id"], purpose_id=exercise["purpose_id"],
+                                    minutes=exercise["minutes"], avghr=exercise["avghr"], 
+                                    kilometers=exercise["kilometers"], sets=None, reps=None, weight=None)
 
-    flash("Workout added succesfully")
-    session.pop("sport_id", None)
-    session.pop("exercise_details", None)
-    session.pop("number_of_exercises", None)
+            if sport_type == "Strength":
+                workouts.insert_workout(workout_id=workout_id, user_id=user_id, sport_id=spid, 
+                                    begin_time=begin_time, end_time=end_time, comments=comments,
+                                    exercise_id=exercise["exercise_id"], purpose_id=exercise["purpose_id"],
+                                    sets=exercise["sets"], reps=exercise["reps"], weight=exercise["weight"],
+                                    minutes=None, avghr=None, kilometers=None)
+                        
+        flash("Workout added succesfully")
+        session.pop("sport_id", None)
+        session.pop("exercise_details", None)
+        session.pop("number_of_exercises", None)
 
-    return render_template("workouts.html", sports=sports, sport_type=sport_type,
-                           exercises=exercises, purposes=purposes, sport_id=spid, 
-                           number_of_exercises=n, exercise_details=details)
+        return render_template("workouts.html", sports=sports, sport_type=sport_type,
+                            exercises=exercises, purposes=purposes, sport_id=spid, 
+                            number_of_exercises=n, exercise_details=details)
 
 
 
@@ -292,20 +274,18 @@ def show_workout(workout_id):
     workout_data = workouts.fetch_workout_data(workout_id)
     workout_sport = workout_data[0][0]
     workout_user = workout_data[0][1]
-    workout_user_id = workout_data[0][14]
     workout_comment = workout_data[0][2]
     workout_begin_time = workout_data[0][3]
     workout_end_time = workout_data[0][4]
+    workout_user_id = workout_data[0][14]
+    workout_sport_id = workout_data[0][16]
 
     previous_comments = workouts.fetch_comments(workout_id)
-    for i in previous_comments:
-        print(i)
-
 
     return render_template("workout_page.html", workout_data=workout_data, workout_sport=workout_sport,
                            workout_user=workout_user, workout_comment=workout_comment, workout_begin_time=workout_begin_time,
                            workout_end_time=workout_end_time, workout_id=workout_id, previous_comments=previous_comments,
-                           workout_user_id=workout_user_id)
+                           workout_user_id=workout_user_id, workout_sport_id=workout_sport_id)
 
 
 @app.route("/add_comment", methods=["POST"])
@@ -347,10 +327,115 @@ def delete_workout():
         workouts.delete_workout(workout_id)
         return show_user(user_id=user_id)
 
-    #täältä ei vielä pysty poistaan
     if source_page == "workout_page.html":
         workouts.delete_workout(workout_id)
         return redirect("/")
+
+
+@app.route("/edit_workout", methods=["POST"])
+def edit_workout():
+
+    require_login()
+    check_csrf()
+    
+    workout_id = request.form["workout_id"]
+    sport_id = request.form["sport_id"]
+    source_page = request.form["source_page"]
+
+    sport_type = workouts.fetch_sport_type(sport_id)[0][0]
+    purposes = workouts.fetch_purposes(sport_type)
+    exercises = workouts.fetch_exercises(sport_id)
+
+    workout_data = workouts.fetch_workout_data(workout_id)
+    details_from_db = {str(i): dict(row) for i, row in enumerate(workout_data)}
+
+    athlete_comment = workout_data[0][2]
+
+    db_time_format = "%d.%m.%Y %H:%M"
+    html_time_format = "%Y-%m-%dT%H:%M"
+    begin_time = workout_data[0][3]
+    end_time = workout_data[0][4]
+    begin_time = datetime.strftime(datetime.strptime(begin_time, db_time_format), html_time_format)
+    end_time = datetime.strftime(datetime.strptime(end_time, db_time_format), html_time_format)
+
+    if source_page == "workout_page.html":
+
+        return render_template("edit_workout.html", workout_id=workout_id, sport_id=sport_id,
+                           purposes=purposes, exercises=exercises, exercise_details=details_from_db,
+                           number_of_exercises=len(workout_data), sport_type=sport_type, begin_time=begin_time,
+                           end_time=end_time, athlete_comment=athlete_comment)
+    
+
+    if source_page == "edit_workout.html":
+
+        action = request.form["button_action"]
+        details = session.get("workout_details", {})
+        n = session.get("number_of_exercises", len(workout_data))
+
+        for i in range(0,n):
+            
+            key = str(i)
+            details[key] = {} 
+            
+            details[key]["exercise_id"] = int(request.form[f"exercise_{i}"])
+            details[key]["purpose_id"] = int(request.form[f"purpose_{i}"])
+
+            if sport_type == "Endurance":
+                details[key]["minutes"] = request.form[f"minutes_{i}"]
+                details[key]["avghr"] = request.form[f"avghr_{i}"]
+                details[key]["kilometers"] = request.form[f"kilometers_{i}"]
+
+            if sport_type == "Strength":
+                details[key]["sets"] = request.form[f"sets_{i}"]
+                details[key]["reps"] = request.form[f"reps_{i}"]
+                details[key]["weight"] = request.form[f"weight_{i}"]
+
+        session["exercise_details"] = details
+
+        begin_time = request.form["begin_time"]
+        end_time = request.form["end_time"]
+        athlete_comment = request.form["comments"]
+
+
+        if action == "add_exercise":
+
+            n += 1
+            session["number_of_exercises"] = n
+            
+            return render_template("edit_workout.html", workout_id=workout_id, sport_id=sport_id,
+                            purposes=purposes, exercises=exercises, exercise_details=details,
+                            number_of_exercises=n, sport_type=sport_type, begin_time=begin_time,
+                            end_time=end_time, athlete_comment=athlete_comment)
+        
+ 
+        if action == "save_workout":
+            
+            user_id = session["user_id"]
+            workouts.delete_workout(workout_id)
+
+            for _, exercise in details.items():
+
+                if sport_type == "Endurance":
+                    workouts.insert_workout(workout_id=workout_id, user_id=user_id, sport_id=sport_id, 
+                                        begin_time=begin_time, end_time=end_time, comments=athlete_comment,
+                                        exercise_id=exercise["exercise_id"], purpose_id=exercise["purpose_id"],
+                                        minutes=exercise["minutes"], avghr=exercise["avghr"], 
+                                        kilometers=exercise["kilometers"], sets=None, reps=None, weight=None)
+
+                if sport_type == "Strength":
+                    workouts.insert_workout(workout_id=workout_id, user_id=user_id, sport_id=sport_id, 
+                                        begin_time=begin_time, end_time=end_time, comments=athlete_comment,
+                                        exercise_id=exercise["exercise_id"], purpose_id=exercise["purpose_id"],
+                                        sets=exercise["sets"], reps=exercise["reps"], weight=exercise["weight"],
+                                        minutes=None, avghr=None, kilometers=None)
+
+            flash("Workout updated succesfully")
+            session.pop("sport_id", None)
+            session.pop("exercise_details", None)
+            session.pop("number_of_exercises", None)
+
+            return show_workout(workout_id=workout_id)
+
 
 
 @app.route("/logout")

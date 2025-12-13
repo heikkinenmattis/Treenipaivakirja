@@ -16,11 +16,20 @@
         <p>Athlete: <a href="/user/{{ workout_user_id }}">{{ workout_user }}</a></p>
         <p>Athlete comment: {{ workout_comment }}</p>
         {% if session.username == workout_user %}
+        <div class="container_buttons">
           <form action="/delete_workout" method="post">
             <input type="hidden" name="workout_id" value="{{ workout_id }}" />
             <input type="hidden" name="source_page" value="workout_page.html" />
             <input type="submit" value="Delete workout"/>
           </form>
+          <form action="/edit_workout" method="post">
+            <input type="hidden" name="workout_id" value="{{ workout_id }}" />
+            <input type="hidden" name="sport_id" value="{{ workout_sport_id }}" />
+            <input type="hidden" name="source_page" value="workout_page.html" />
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+            <input type="submit" value="Edit workout"/>
+          </form>
+        </div>
         {% endif %}
     </div>
 </div>
