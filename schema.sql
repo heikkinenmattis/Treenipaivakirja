@@ -79,12 +79,3 @@ create table comments (
 	content TEXT
 );
 
-
-
-create table replies (
-	id INTEGER PRIMARY KEY,
-	comment_id INTEGER REFERENCES comments(id),
-	user_id INTEGER REFERENCES users(id),
-	timestamp TEXT,
-	content TEXT
-);

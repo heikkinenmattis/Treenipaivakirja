@@ -29,12 +29,41 @@
   <p>
     Maximum heart rate: <br />
     <input type="number" name="max_heart_rate" value="{{userdata["max_heart_rate"]}}"/>
-
   </p>
   <p>
     FTP: <br />
     <input type="number" name="ftp_cycling" value="{{userdata["ftp_cycling"]}}"/>
   </p>
+
+
+  <p>
+    <label for="fav_sport">Favorite sport:</label> 
+    <select name="fav_sport" id="fav_sport">
+
+    {% for sport in sports %}
+      {% if userdata["fav_sport_id"] == sport.sport_id %} 
+        <option value="{{ sport.sport_id }}" selected>{{ sport.sport_name }}</option>
+      {% else %}
+        <option value="{{ sport.sport_id }}">{{ sport.sport_name }}</option>
+      {% endif %}
+    {% endfor %}
+    </select>
+  </p>
+
+  <p>
+    <label for="user_city">City:</label> 
+    <select name="user_city" id="user_city">
+
+    {% for city in cities %}
+      {% if userdata["city_id"] == city.city_id %} 
+        <option value="{{ city.city_id }}" selected>{{ city.city }}</option>
+      {% else %}
+        <option value="{{ city.city_id }}">{{ city.city }}</option>
+      {% endif %}
+    {% endfor %}
+    </select>
+  </p>
+
   <input type="submit" value="Save user data"/>
   <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />    
 </form>
