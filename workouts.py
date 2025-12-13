@@ -14,9 +14,9 @@ def fetch_exercises(sport_id):
 
 
 def fetch_sports():
-    sql = """   SELECT DISTINCT sport_id, sport_name from sports where 1 = ?"""
+    sql = """   SELECT DISTINCT sport_id, sport_name from sports"""
 
-    return db.query(sql, [1])
+    return db.query(sql, [])
 
 
 def fetch_sport_type(sport_id):
@@ -31,13 +31,6 @@ def insert_workout(workout_id, user_id, sport_id, begin_time, end_time, comments
                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 """
     db.execute(sql, [workout_id, user_id, sport_id, begin_time, end_time, comments, sets, reps, weight, minutes, avghr, kilometers, exercise_id, purpose_id])
-
-# def insert_workout(workout_id, user_id, sport_id, begin_time, end_time, comments, sets=None, 
-#                    reps=None, weight=None, minutes=None, avghr=None, kilometers=None):
-#     sql = """   INSERT INTO workouts (workout_id, user_id, sport_id, begin_time, end_time, comments, sets, reps, weight, minutes, avghr, kilometers)
-#                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
-#                 """
-#     db.execute(sql, [workout_id, user_id, sport_id, begin_time, end_time, comments, sets, reps, weight, minutes, avghr, kilometers])
 
 
 def fetch_purposes(sport_type):

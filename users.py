@@ -27,7 +27,7 @@ def check_login(username, password):
 
 
 def add_userdata(username, first_name, last_name, date_of_birth, height, weight,
-                 max_heart_rate, ftp_cycling):
+                 max_heart_rate, ftp_cycling, fav_sport, city):
     sql = """UPDATE users SET 
                 first_name = ?, 
                 last_name = ?, 
@@ -35,10 +35,12 @@ def add_userdata(username, first_name, last_name, date_of_birth, height, weight,
                 height = ?, 
                 weight = ?,
                 max_heart_rate = ?, 
-                ftp_cycling = ?
+                ftp_cycling = ?,
+                fav_sport_id = ?,
+                city_id = ?
                 where username = ?"""
     db.execute(sql, [first_name, last_name, date_of_birth, height, weight,
-                 max_heart_rate, ftp_cycling, username])
+                 max_heart_rate, ftp_cycling, fav_sport, city, username])
 
 
 
@@ -54,7 +56,11 @@ def fetch_userdata(user_id):
                         u.fav_sport_id, 
                         s.sport_name, 
                         c.city,
-                        u.username
+                        u.username,
+                        c.region,
+                        c.country,
+                        u.city_id
+
                 FROM users u 
                 LEFT JOIN sports s 
                     on u.fav_sport_id = s.sport_id
@@ -122,3 +128,13 @@ def fetch_most_common_exercise(user_id):
             """
 
     return db.query(sql, [user_id])
+
+
+def fetch_cities():
+    sql = """   SELECT  city_id, 
+                        city 
+    
+                from cities
+            """
+
+    return db.query(sql, [])

@@ -87,8 +87,11 @@ def user_attributes():
     # To prefill forms, let's fetch existing user data first.
     user_id = session["user_id"]
     userdata = users.fetch_userdata(user_id)[0]
+    sports = workouts.fetch_sports()
+    cities = users.fetch_cities()
 
-    return render_template("user_attributes.html", userdata=userdata)
+    return render_template("user_attributes.html", userdata=userdata, 
+                           sports=sports, cities=cities)
 
 @app.route("/add_user_data", methods=["POST"])
 def add_user_data():
@@ -106,14 +109,14 @@ def add_user_data():
     height = request.form["height"]
     max_heart_rate = request.form["max_heart_rate"]
     ftp_cycling = request.form["ftp_cycling"]
-
-    # fav_sport yet to come from a dropdown
-    # city yet to come from a dropdown
+    fav_sport = int(request.form["fav_sport"])
+    city = int(request.form["user_city"])
 
     users.add_userdata(username=session_username, first_name=first_name, 
                        last_name=last_name, date_of_birth=date_of_birth, 
                        weight=weight, height=height, 
-                       max_heart_rate=max_heart_rate, ftp_cycling=ftp_cycling)
+                       max_heart_rate=max_heart_rate, ftp_cycling=ftp_cycling,
+                       fav_sport=fav_sport, city=city)
 
     flash("User data updated succesfully")        
     return redirect("/")
@@ -166,9 +169,10 @@ def add_workout():
     require_login()
     check_csrf()
 
+    spid = session.get("sport_id", 1)
     sports = workouts.fetch_sports()
-    sport_type = workouts.fetch_sport_type(session["sport_id"])[0][0]
-    exercises = workouts.fetch_exercises(session["sport_id"])
+    sport_type = workouts.fetch_sport_type(spid)[0][0]
+    exercises = workouts.fetch_exercises(spid)
     purposes = workouts.fetch_purposes(sport_type)
 
     details = session.get("exercise_details", {})
@@ -206,7 +210,7 @@ def add_workout():
         session["number_of_exercises"] = n
 
         return render_template("workouts.html", sports=sports, sport_type=sport_type,
-                            exercises=exercises, purposes=purposes, sport_id=session["sport_id"], 
+                            exercises=exercises, purposes=purposes, sport_id=spid, 
                             number_of_exercises=n, exercise_details=details,begin_time=begin_time,
                             end_time=end_time, athlete_comment=comments)
     
@@ -214,7 +218,14 @@ def add_workout():
     if action == "save_workout":
 
         workout_id = str(uuid.uuid4())
-        spid = session["sport_id"]
+
+        if not details:
+            flash("Cannot save workout without exercises. Please enter exercises.")
+
+            return render_template("workouts.html", sports=sports, sport_type=sport_type,
+                    exercises=exercises, purposes=purposes, sport_id=spid, 
+                    number_of_exercises=n, exercise_details=details)            
+
 
         for _, exercise in details.items():
 
