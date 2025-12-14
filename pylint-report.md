@@ -153,3 +153,35 @@ workouts.py:28:0: R0913: Too many arguments (14/5) (too-many-arguments)
 Nämä kaksi ilmoitusta viittaavat ```users.py``` ja ```workouts.py``` -moduulien funktioihin ```add_userdata()``` ja ```insert_workout()```. Kummassakin funktiossa tietoa syötetään yhteen tauluun, eikä olisi mitään mieltä alkaa pilkkomaan käyttäjätietojen syöttämistä ja treenin syöttämistä useammalle funktiolle.
 
 Kehittäjän päätöksellä nämä funktiot saavat ottaa vastaan liikaa argumentteja.
+
+## Liian samanlainen teksti kahdessa funktiossa
+
+```
+workouts.py:1:0: R0801: Similar lines in 2 files
+==users:[77:87]
+==workouts:[71:81]
+                        w.workout_id,
+                        w.user_id,
+                        u.username,
+                        s.sport_name,
+                        datetime(w.begin_time) as begin_time,
+                        datetime(w.end_time) as end_time,
+                        case when s.sport_type = 'Strength' then sum(w.sets*w.reps*w.weight) else null end as total_kilograms,
+                        case when s.sport_type = 'Endurance' then sum(w.kilometers) else null end as kilometers,
+                        s.sport_type,
+                        timediff(w.end_time, w.begin_time) as duration, (duplicate-code)
+workouts.py:1:0: R0801: Similar lines in 2 files
+==users:[90:95]
+==workouts:[83:88]
+                from workouts w
+                join sports s on w.sport_id = s.sport_id
+                join users u on w.user_id = u.id
+                join exercises e on w.exercise_id = e.exercise_id
+                join exercise_purposes p on w.purpose_id = p.purpose_id (duplicate-code)
+```
+
+Nämä ilmoitukset viittaavat toisteisuuteen kahdessa eri tiedostossa ```workouts.py``` ja ```users.py```. Tiedostojen funktiot ```get_workouts()``` ja ```fetch_user_workouts()``` ovat hyvin samanlaiset keskenään.
+
+On kieltämättä totta, että nostaessa tietyn käyttäjän treeni ja nostaessa kaikki treenit kentät ja tietokantakyselyn rakenne on sama. Ainoaksi eroksi muodostuu täten käyttäjän harjoituksen hakevassa ```fetch_user_workouts()``` -funktiossa oleva ehto, joka rajaa palautettavat tietueet yhteen käyttäjään. 
+
+Kehittäjän päätöksellä tämä virhe jätetään ohjelmaan, koska kehittäjä haluaa erotella harjoituksia ja käyttäjiä koskevat tietokantatoimenpiteet.
