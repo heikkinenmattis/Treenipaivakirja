@@ -2,10 +2,11 @@ import sqlite3
 import secrets
 import uuid
 import math
+import time
 
 from datetime import datetime
 from flask import Flask
-from flask import redirect, render_template, request, flash, abort
+from flask import redirect, render_template, request, flash, abort, g
 from flask import session
 import markupsafe
 
@@ -15,6 +16,16 @@ import workouts
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
+
+@app.before_request
+def before_request():
+    g.start_time = time.time()
+
+@app.after_request
+def after_request(response):
+    elapsed_time = round(time.time() - g.start_time, 2)
+    print("elapsed time:", elapsed_time, "s")
+    return response
 
 def require_login():
     if "user_id" not in session:

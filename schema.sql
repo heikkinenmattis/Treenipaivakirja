@@ -79,3 +79,10 @@ create table comments (
 	content TEXT
 );
 
+
+CREATE INDEX idx_workout_id ON workouts(workout_id);
+CREATE INDEX idx_workout_user ON workouts(user_id);
+CREATE INDEX idx_workout_bt ON workouts(begin_time);
+CREATE INDEX idx_users_id ON users(id);
+CREATE INDEX idx_comments_workout ON comments(workout_id);
+CREATE INDEX idx_comments_user ON comments(user_id);

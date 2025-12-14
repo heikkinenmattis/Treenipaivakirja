@@ -4,3 +4,4 @@ __pycache__
 categories.xlsx
 local_backups
 .DS_Store
+schema_no_indexes.sql
