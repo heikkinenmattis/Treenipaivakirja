@@ -14,7 +14,7 @@
     </div>
     <div class="box_user">
         <p>Athlete: <a href="/user/{{ workout_user_id }}">{{ workout_user }}</a></p>
-        <p>Athlete comment: {{ workout_comment | show_lines }}</p>
+        <p class="paragraph_comment">Athlete comment: {{ workout_comment | show_lines }}</p>
         {% if session.username == workout_user %}
         <div class="container_buttons">
           <form action="/delete_workout" method="post">
@@ -66,7 +66,7 @@
     <li>
       <strong><a href="/user/{{ comment.user_id }}">{{ comment.username }}</a></strong> at {{ comment.timestamp }}<br>
         <ul>
-          <p>{{ comment.content | show_lines }}</p>
+          <li><p class="paragraph_comment">{{ comment.content | show_lines }}</p></li>
         </ul>
     </li>
   {% endfor %}

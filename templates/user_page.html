@@ -35,7 +35,7 @@
     <a href="/workouts/{{ workout.workout_id }}">{{ workout.time_to_present }}</a> <br />
     <p>Begin time: {{ workout.begin_time }}</p>
     <p>Sport: {{ workout.sport_name }}</p>
-    <p>Comments: {{ workout.comments }}</p>
+    <p class="paragraph_comment">Comments: {{ workout.comments | show_lines }}</p>
 
     {% if session.username == workout.username %}
         <p>

@@ -61,3 +61,9 @@ a:link {
 a:visited {
   color: rgb(174, 174, 174);
 }
+
+.paragraph_comment {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;   
+}
