@@ -24,7 +24,7 @@
 
 
 <p>
-  The user has posted {{ user_workouts | count }} workouts.
+  The user has posted {{ workouts_count }} workouts.
 </p>
 <h3>Recent workouts</h3>
 <ul>
@@ -43,7 +43,7 @@
             <input type="submit" value="Delete workout"/>
             <input type="hidden" name="workout_id" value="{{ workout.workout_id }}" />
             <input type="hidden" name="source_page" value="user_page.html" />
-            <input type="hidden" name="user_id" value="{{ workout.user_id }}" />     
+            <input type="hidden" name="user_id" value="{{ workout.user_id }}" />
         </form>
         </p>
     {% else %}
@@ -55,4 +55,22 @@
   {% endfor %}
 
 </ul>
+
+{% if page_count > 1 %}
+    <p>
+    {% if page > 1 %}
+            <a href="/user/{{ user.id }}/{{ page - 1 }}">&lt;&lt;</a>
+        {% else %}
+            &lt;&lt;
+        {% endif %}
+        Page {{ page }}/{{ page_count }}
+        {% if page < page_count %}
+            <a href="/user/{{ user.id }}/{{ page + 1 }}">&gt;&gt;</a>
+        {% else %}
+            &gt;&gt;
+    {% endif %}
+    </p>
+    <hr />
+{% endif %}
+
 {% endblock %}

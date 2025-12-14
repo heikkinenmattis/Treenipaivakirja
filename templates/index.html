@@ -25,7 +25,27 @@
     {% endfor %}
     </ul>
 
+    {% if page_count > 1 %}
+        <p>
+        {% if page > 1 %}
+                <a href="/{{ page - 1 }}">&lt;&lt;</a>
+            {% else %}
+                &lt;&lt;
+            {% endif %}
+            Page {{ page }}/{{ page_count }}
+            {% if page < page_count %}
+                <a href="/{{ page + 1 }}">&gt;&gt;</a>
+            {% else %}
+                &gt;&gt;
+        {% endif %}
+        </p>
+        <hr />
+    {% endif %}
+    
 {% endif %}
+
+
+
 
 {% endblock %}
 

@@ -65,7 +65,8 @@ def fetch_purposes(sport_type):
     return db.query(sql, [sport_type])
 
 
-def get_workouts():
+def get_workouts(page=1, page_size=20):
+    starting_point = (page-1) * page_size
     sql = """   select distinct         
                         
                         w.workout_id,
@@ -87,10 +88,17 @@ def get_workouts():
                 join exercise_purposes p on w.purpose_id = p.purpose_id 
                 group by w.workout_id, u.username, s.sport_name, w.begin_time, w.end_time
                 order by datetime(w.begin_time) desc
+                limit ? offset ?
                 """
 
-    return db.query(sql, [])
+    return db.query(sql, [page_size, starting_point])
 
+def get_workout_count():
+    sql = """   select count(distinct w.workout_id)
+                from workouts w
+            """
+
+    return db.query(sql, [])
 
 
 def fetch_workout_data(workout_id):
@@ -160,7 +168,8 @@ def comment_workout(user_id, workout_id, timestamp, content):
 
 
 
-def fetch_comments(workout_id):
+def fetch_comments(workout_id, page=1, page_size=5):
+    starting_point = (page-1) * page_size
     sql = """   select  c.user_id,
                         u.username,
                         c.workout_id,
@@ -171,6 +180,16 @@ def fetch_comments(workout_id):
                 join users u on c.user_id = u.id
                 where c.workout_id = ?
                 order by datetime(c.timestamp) desc
+                limit ? offset ?
+                """
+
+    return db.query(sql, [workout_id, page_size, starting_point])
+
+
+def fetch_comments_count(workout_id):
+    sql = """   select count(distinct c.id)
+                from comments c
+                where c.workout_id = ?
                 """
 
     return db.query(sql, [workout_id])

@@ -59,7 +59,8 @@ def fetch_userdata(user_id):
                         u.username,
                         c.region,
                         c.country,
-                        u.city_id
+                        u.city_id,
+                        u.id
 
                 FROM users u 
                 LEFT JOIN sports s 
@@ -71,7 +72,8 @@ def fetch_userdata(user_id):
     return db.query(sql, [user_id])
 
 
-def fetch_user_workouts(user_id):
+def fetch_user_workouts(user_id, page=1, page_size=20):
+    starting_point = (page-1) * page_size
     sql = """select distinct 
                         
                         w.workout_id,
@@ -94,11 +96,19 @@ def fetch_user_workouts(user_id):
                 join exercise_purposes p on w.purpose_id = p.purpose_id
                 where u.id = ?
                 group by w.workout_id, u.username, s.sport_name, w.begin_time, w.end_time
-                order by datetime(w.begin_time) DESC """
+                order by datetime(w.begin_time) DESC 
+                limit ? offset ?
+                """
+
+    return db.query(sql, [user_id, page_size, starting_point])
+
+def get_user_workout_count(user_id):
+    sql = """select count(distinct w.workout_id)
+                from workouts w
+                where w.user_id = ?
+                 """
 
     return db.query(sql, [user_id])
-
-
 
 def fetch_most_common_sport(user_id):
 

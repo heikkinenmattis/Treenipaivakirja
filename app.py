@@ -2,6 +2,7 @@ import sqlite3
 import secrets
 import uuid
 import re
+import math
 
 from datetime import datetime
 from flask import Flask
@@ -28,9 +29,18 @@ def check_csrf():
 
 
 @app.route("/")
-def index():
-    all_workouts = workouts.get_workouts()
-    return render_template("index.html", workouts=all_workouts)
+@app.route("/<int:page>")
+def index(page=1):
+
+    workouts_count = workouts.get_workout_count()[0][0]
+
+    page_size = 10
+    page_count = math.ceil(workouts_count / page_size)
+    page_count = max(page_count, 1)
+
+    all_workouts = workouts.get_workouts(page, page_size)
+
+    return render_template("index.html", workouts=all_workouts, page=page, page_count=page_count)
 
 @app.route("/login", methods=["GET","POST"])
 def login():
@@ -399,9 +409,16 @@ def add_workout():
 def reset_workout():
     return workouts_page()
 
-
 @app.route("/user/<int:user_id>")
-def show_user(user_id):
+@app.route("/user/<int:user_id>/<int:page>")
+def show_user(user_id, page=1):
+
+
+    workouts_count = users.get_user_workout_count(user_id)[0][0]
+
+    page_size = 10
+    page_count = math.ceil(workouts_count / page_size)
+    page_count = max(page_count, 1)
 
     user = users.fetch_userdata(user_id)[0]
     if not user:
@@ -410,17 +427,20 @@ def show_user(user_id):
     most_common_sport = users.fetch_most_common_sport(user_id)[0]
     most_common_exercise = users.fetch_most_common_exercise(user_id)[0]
 
-    user_workouts = users.fetch_user_workouts(user_id)
+    user_workouts = users.fetch_user_workouts(user_id, page, page_size)
     return render_template("user_page.html",
                            user=user,
                            user_workouts=user_workouts,
                            most_common_sport=most_common_sport,
-                           most_common_exercise=most_common_exercise)
-
+                           most_common_exercise=most_common_exercise,
+                           page=page,
+                           page_count=page_count,
+                           workouts_count=workouts_count)
 
 
 @app.route("/workouts/<workout_id>")
-def show_workout(workout_id):
+@app.route("/workouts/<workout_id>/<int:page>")
+def show_workout(workout_id, page=1):
 
     require_login()
 
@@ -433,7 +453,13 @@ def show_workout(workout_id):
     workout_user_id = workout_data[0][14]
     workout_sport_id = workout_data[0][16]
 
-    previous_comments = workouts.fetch_comments(workout_id)
+    comments_count = workouts.fetch_comments_count(workout_id)[0][0]
+
+    page_size = 5
+    page_count = math.ceil(comments_count / page_size)
+    page_count = max(page_count, 1)
+
+    previous_comments = workouts.fetch_comments(workout_id, page, page_size)
 
     return render_template("workout_page.html",
                             workout_data=workout_data,
@@ -445,7 +471,9 @@ def show_workout(workout_id):
                             workout_id=workout_id,
                             previous_comments=previous_comments,
                             workout_user_id=workout_user_id,
-                            workout_sport_id=workout_sport_id)
+                            workout_sport_id=workout_sport_id,
+                            page=page,
+                            page_count=page_count)
 
 
 @app.route("/add_comment", methods=["POST"])
