@@ -20,6 +20,7 @@
           <form action="/delete_workout" method="post">
             <input type="hidden" name="workout_id" value="{{ workout_id }}" />
             <input type="hidden" name="source_page" value="workout_page.html" />
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
             <input type="submit" value="Delete workout"/>
           </form>
           <form action="/edit_workout" method="post">
@@ -39,9 +40,7 @@
 </p>
 <h3>Exercises in workout</h3>
 <ul>
-
   {% for exercise in workout_data %}
-    
     <div class="workout">
       <p>{{ exercise.exercise_name }}</p>
       {% if exercise.sport_type == "Strength" %}
@@ -56,31 +55,23 @@
         <p>Kilometers: {{ exercise.kilometers }}</p>
       {% endif %}
     </div>
-
-
   {% endfor %}
 
 </ul>
 
-
-
 <h4>Comments related to this workout</h4>
-
 <ul>
 {% if previous_comments %}
   {% for comment in previous_comments %}
-    
     <li>
       <strong><a href="/user/{{ comment.user_id }}">{{ comment.username }}</a></strong> at {{ comment.timestamp }}<br>
         <ul>
           <li><p>{{ comment.content }}</p></li>
         </ul>
     </li>
-
   {% endfor %}
 {% endif %}
 </ul>
-
 
 <form action="/add_comment" method="post">
   <p>

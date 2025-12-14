@@ -27,10 +27,27 @@ def fetch_sport_type(sport_id):
 
 def insert_workout(workout_id, user_id, sport_id, begin_time, end_time, comments, sets, 
                    reps, weight, minutes, avghr, kilometers, exercise_id, purpose_id):
-    sql = """   INSERT INTO workouts (workout_id, user_id, sport_id, begin_time, end_time, comments, sets, reps, weight, minutes, avg_hr, kilometers, exercise_id, purpose_id)
+    sql = """   INSERT INTO workouts (  workout_id,
+                                        user_id,
+                                        sport_id,
+                                        begin_time,
+                                        end_time,
+                                        comments,
+                                        sets,
+                                        reps,
+                                        weight,
+                                        minutes,
+                                        avg_hr,
+                                        kilometers,
+                                        exercise_id,
+                                        purpose_id)
+                                        
                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 """
-    db.execute(sql, [workout_id, user_id, sport_id, begin_time, end_time, comments, sets, reps, weight, minutes, avghr, kilometers, exercise_id, purpose_id])
+    db.execute(sql, [workout_id, user_id, sport_id,
+                     begin_time, end_time, comments,
+                     sets, reps, weight, minutes, avghr,
+                     kilometers, exercise_id, purpose_id])
 
 
 def fetch_purposes(sport_type):
@@ -128,7 +145,7 @@ def search_workouts(query):
                 join exercise_purposes p on w.purpose_id = p.purpose_id 
                 where lower(s.sport_name) LIKE ? or lower(e.exercise_name) LIKE ?
                 """
-    
+
     search_word = f"%{query}%"
 
     return db.query(sql, [search_word, search_word])
@@ -155,7 +172,7 @@ def fetch_comments(workout_id):
                 where c.workout_id = ?
                 order by datetime(c.timestamp) desc
                 """
-    
+
     return db.query(sql, [workout_id])
 
 

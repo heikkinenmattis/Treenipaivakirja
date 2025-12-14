@@ -136,15 +136,15 @@
 
   <p>
     Begin time: <br />
-    <input type="datetime-local" name="begin_time" value="{{ begin_time }}" /> <!-- REQUIRED--->
+    <input type="datetime-local" name="begin_time" value="{{ begin_time }}"/> 
   </p>
   <p>
     End time: <br />
-    <input type="datetime-local" name="end_time" value="{{ end_time }}" /> <!-- REQUIRED--->
+    <input type="datetime-local" name="end_time" value="{{ end_time }}"/> 
   </p>
   <p>
     Athlete comment: <br />
-    <textarea name="comments" rows="5" cols="40">{{ athlete_comment }}</textarea>
+    <textarea name="comments" rows="5" cols="40" maxlength="4000">{{ athlete_comment }}</textarea>
   </p>
   
   <button name="button_action" value="add_exercise">Add exercise</button>    

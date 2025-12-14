@@ -46,15 +46,15 @@ def add_userdata(username, first_name, last_name, date_of_birth, height, weight,
 
 
 def fetch_userdata(user_id):
-    sql = """   SELECT  u.first_name, 
-                        u.last_name, 
-                        u.date_of_birth, 
-                        u.height, 
-                        u.weight, 
-                        u.max_heart_rate, 
-                        u.ftp_cycling, 
-                        u.fav_sport_id, 
-                        s.sport_name, 
+    sql = """   SELECT  u.first_name,
+                        u.last_name,
+                        u.date_of_birth,
+                        u.height,
+                        u.weight,
+                        u.max_heart_rate,
+                        u.ftp_cycling,
+                        u.fav_sport_id,
+                        s.sport_name,
                         c.city,
                         u.username,
                         c.region,
@@ -72,7 +72,7 @@ def fetch_userdata(user_id):
 
 
 def fetch_user_workouts(user_id):
-    sql = """select distinct         
+    sql = """select distinct 
                         
                         w.workout_id,
                         w.user_id,
@@ -102,7 +102,7 @@ def fetch_user_workouts(user_id):
 
 def fetch_most_common_sport(user_id):
 
-    sql = """   SELECT  s.sport_name, 
+    sql = """   SELECT  s.sport_name,
                         COUNT(distinct w.workout_id) as sport_count
 
                 FROM workouts w
@@ -116,7 +116,7 @@ def fetch_most_common_sport(user_id):
     return db.query(sql, [user_id])
 
 def fetch_most_common_exercise(user_id):
-    sql = """   SELECT  e.exercise_name, 
+    sql = """   SELECT  e.exercise_name,
                         COUNT(e.exercise_name) as exercise_count
 
                 FROM workouts w
@@ -131,7 +131,7 @@ def fetch_most_common_exercise(user_id):
 
 
 def fetch_cities():
-    sql = """   SELECT  city_id, 
+    sql = """   SELECT  city_id,
                         city 
     
                 from cities
