@@ -7,31 +7,31 @@
 
 <form action="/add_user_data" method="post">
   <p>
-    First name: <br />
+    <label for="first_name">First name: </label><br />
     <input type="text" name="first_name" value="{{userdata["first_name"]}}" minlength="2" maxlength="20"/>
   </p>
   <p>
-    Last name: <br />
+    <label for="last_name">Last name: </label><br />
     <input type="text" name="last_name" value="{{userdata["last_name"]}}" minlength="2" maxlength="40"/>
   </p>
   <p>
-    Date of birth: <br />
+    <label for="date_of_birth">Date of birth: </label><br />
     <input type="date" name="date_of_birth" value="{{userdata["date_of_birth"]}}"/>
   </p>
   <p>
-    Weight (kg): <br />
+    <label for="weight">Weight (kg): </label><br />
     <input type="number" name="weight" value="{{userdata["weight"]}}" min="30" max="300"/>
   </p>
   <p>
-    Height (cm): <br />
+    <label for="height">Height (cm): </label><br />
     <input type="number" name="height" value="{{userdata["height"]}}" min="100" max="235"/>
   </p>
   <p>
-    Maximum heart rate (bpm): <br />
+    <label for="max_heart_rate">Maximum heart rate (bpm): </label><br />
     <input type="number" name="max_heart_rate" value="{{userdata["max_heart_rate"]}}" min="30" max="230"/>
   </p>
   <p>
-    FTP (W): <br />
+    <label for="ftp_cycling">FTP (W): </label><br />
     <input type="number" name="ftp_cycling" value="{{userdata["ftp_cycling"]}}" min="50" max="500"/>
   </p>
 

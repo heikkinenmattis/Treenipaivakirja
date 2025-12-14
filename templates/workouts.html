@@ -93,33 +93,33 @@
         {% if sport_type == "Strength" %}
         
           <p>
-            Sets: <br />
+            <label for="{{ "sets_" ~ i }}">Sets: </label><br />
             <input type="number" name="{{ "sets_" ~ i }}" value="{{ exercise_details[i|string]["sets"] }}"/>
           </p>
 
           <p>
-            Reps: <br />
+            <label for="{{ "reps_" ~ i }}">Reps: </label><br />
             <input type="number" name="{{ "reps_" ~ i }}" value="{{ exercise_details[i|string]["reps"] }}"/>
           </p>
 
           <p>
-            Weight: <br />
+            <label for="{{ "weight_" ~ i }}">Weight: </label><br />
             <input type="number" name="{{ "weight_" ~ i }}" value="{{ exercise_details[i|string]["weight"] }}"/>
           </p>
 
         {% else %}
           <p>
-            Minutes: <br />
+            <label for="{{ "minutes_" ~ i }}">Minutes: </label><br />
             <input type="number" name="{{ "minutes_" ~ i }}" value="{{ exercise_details[i|string]["minutes"] }}"/>
           </p>
 
           <p>
-            Average hr: <br />
+            <label for="{{ "avghr_" ~ i }}">Average hr: </label><br />
             <input type="number" name="{{ "avghr_" ~ i }}" value="{{ exercise_details[i|string]["avghr"] }}"/>
           </p>
 
           <p>
-            Kilometers: <br />
+            <label for="{{ "kilometers_" ~ i }}">Kilometers: </label><br />
             <input type="number" name="{{ "kilometers_" ~ i }}" value="{{ exercise_details[i|string]["kilometers"] }}"/>
           </p>
 
@@ -130,33 +130,33 @@
         {% if sport_type == "Strength" %}
         
           <p>
-            Sets: <br />
+            <label for="{{ "sets_" ~ i }}">Sets: </label><br />
             <input type="number" name="{{ "sets_" ~ i }}" value=""/>
           </p>
 
           <p>
-            Reps: <br />
+            <label for="{{ "reps_" ~ i }}">Reps: </label><br />
             <input type="number" name="{{ "reps_" ~ i }}" value=""/>
           </p>
 
           <p>
-            Weight: <br />
+            <label for="{{ "weight_" ~ i }}">Weight: </label><br />
             <input type="number" name="{{ "weight_" ~ i }}" value=""/>
           </p>
 
         {% else %}
           <p>
-            Minutes: <br />
+            <label for="{{ "minutes_" ~ i }}">Minutes: </label><br />
             <input type="number" name="{{ "minutes_" ~ i }}" value=""/>
           </p>
 
           <p>
-            Average hr: <br />
+            <label for="{{ "avghr_" ~ i }}">Average hr: </label><br />
             <input type="number" name="{{ "avghr_" ~ i }}" value=""/>
           </p>
 
           <p>
-            Kilometers: <br />
+            <label for="{{ "kilometers_" ~ i }}">Kilometers: </label><br />
             <input type="number" name="{{ "kilometers_" ~ i }}" value=""/>
           </p>
 
@@ -168,15 +168,15 @@
 
   {% endfor %}
   <p>
-    Begin time: <br />
+    <label for="begin_time">Begin time: </label><br />
     <input type="datetime-local" name="begin_time" value="{{ begin_time }}"/>
   </p>
   <p>
-    End time: <br />
+    <label for="end_time">End time: </label><br />
     <input type="datetime-local" name="end_time" value="{{ end_time }}"/>
   </p>
   <p>
-    Athlete comment: <br />
+    <label for="comments">Athlete comment: </label><br />
     <textarea name="comments" rows="5" cols="40" maxlength="4000">{{ athlete_comment }}</textarea>
   </p>
   <button name="button_action" value="add_exercise">Add exercise</button>    
