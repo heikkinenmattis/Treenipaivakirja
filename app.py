@@ -7,6 +7,7 @@ from datetime import datetime
 from flask import Flask
 from flask import redirect, render_template, request, flash, abort
 from flask import session
+import markupsafe
 
 import config
 import users
@@ -53,6 +54,11 @@ def login():
             return redirect("/login")
 
 
+@app.template_filter()
+def show_lines(content):
+    content = str(markupsafe.escape(content))
+    content = content.replace("\n", "<br />")
+    return markupsafe.Markup(content)
 
 
 @app.route("/register.html")
