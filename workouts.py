@@ -113,7 +113,7 @@ def fetch_workout_data(workout_id):
                         w.sets,
                         w.reps,
                         w.weight,
-                        w.avg_hr,
+                        w.avg_hr as avghr,
                         w.minutes,
                         w.kilometers,
                         u.id,

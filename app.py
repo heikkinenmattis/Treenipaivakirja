@@ -1,7 +1,6 @@
 import sqlite3
 import secrets
 import uuid
-import re
 import math
 
 from datetime import datetime
@@ -45,13 +44,10 @@ def index(page=1):
 @app.route("/login", methods=["GET","POST"])
 def login():
 
-    if request.method == "GET":
-        return render_template("index.html")
-
     if request.method == "POST":
 
         username = request.form["username"]
-        password = request.form["password"]        
+        password = request.form["password"]
         user_id = users.check_login(username, password)
 
         if user_id:
@@ -59,9 +55,12 @@ def login():
             session["username"] = username
             session["csrf_token"] = secrets.token_hex(16)
             return redirect("/")
-        else:
-            flash("ERROR: Username or password not recognized")
-            return redirect("/login")
+
+        flash("ERROR: Username or password not recognized")
+        return redirect("/login")
+
+    return render_template("index.html")
+
 
 
 @app.template_filter()
@@ -125,40 +124,40 @@ def add_user_data():
     first_name = request.form["first_name"]
     last_name = request.form["last_name"]
     date_of_birth = request.form["date_of_birth"]
-    weight = request.form["weight"]
-    height = request.form["height"]
-    max_heart_rate = request.form["max_heart_rate"]
-    ftp_cycling = request.form["ftp_cycling"]
+    weight = int(request.form["weight"])
+    height = int(request.form["height"])
+    max_heart_rate = int(request.form["max_heart_rate"])
+    ftp_cycling = int(request.form["ftp_cycling"])
     fav_sport = int(request.form["fav_sport"])
     city = int(request.form["user_city"])
 
+    error_msg = None
+
     if len(first_name) < 2 or len(first_name) > 20:
-        flash("ERROR: First name too short or too long.")
+        error_msg = "ERROR: First name too short or too long."
+
+    elif len(last_name) < 2 or len(last_name) > 40:
+        error_msg = "ERROR: Last name too short or too long."
+
+    elif datetime.strptime(date_of_birth, "%Y-%m-%d") < datetime(1900,1,1):
+        error_msg = "ERROR: Suspicious birth date."
+
+    elif weight < 30 or weight > 300:
+        error_msg = "ERROR: Suspicious weight."
+
+    elif height < 100 or height > 235:
+        error_msg = "ERROR: Suspicious weight."
+
+    elif max_heart_rate < 30 or max_heart_rate > 230:
+        error_msg = "ERROR: Suspicious maximum heart rate."
+
+    elif ftp_cycling < 50 or ftp_cycling > 500:
+        error_msg = "ERROR: Suspicious FTP."
+
+    if error_msg:
+        flash(error_msg)
         return redirect("/user_attributes.html")
 
-    if len(last_name) < 2 or len(last_name) > 40:
-        flash("ERROR: Last name too short or too long.")
-        return redirect("/user_attributes.html")
-
-    if not re.search("^(19|20)\d{2}$", date_of_birth):
-        flash("ERROR: Suspicious birth date.")
-        return redirect("/user_attributes.html")
-
-    if weight < 30 or weight > 300:
-        flash("ERROR: Suspicious weight.")
-        return redirect("/user_attributes.html")
-
-    if height < 100 or height > 235:
-        flash("ERROR: Suspicious weight.")
-        return redirect("/user_attributes.html")
-
-    if max_heart_rate < 30 or max_heart_rate > 230:
-        flash("ERROR: Suspicious maximum heart rate.")
-        return redirect("/user_attributes.html")
-
-    if ftp_cycling < 50 or ftp_cycling > 500:
-        flash("ERROR: Suspicious FTP.")
-        return redirect("/user_attributes.html")
 
     users.add_userdata(username=session_username,
                        first_name=first_name,
@@ -279,44 +278,25 @@ def add_workout():
 
     if action == "save_workout":
         workout_id = str(uuid.uuid4())
+        error_msg = None
+
         if not details:
-            flash("Cannot save workout without exercises. Please enter exercises.")
+            error_msg = "Cannot save workout without exercises. Please enter exercises."
 
-            return render_template("workouts.html",
-                                    sports=sports,
-                                    sport_type=sport_type,
-                                    exercises=exercises,
-                                    purposes=purposes,
-                                    sport_id=spid,
-                                    number_of_exercises=n,
-                                    exercise_details=details)
+        elif begin_time and end_time:
+            compare_begintime = datetime.strptime(begin_time, "%Y-%m-%dT%H:%M")
+            compare_endtime = datetime.strptime(end_time, "%Y-%m-%dT%H:%M")
+            if compare_begintime > compare_endtime:
+                error_msg = "ERROR: Cannot save a workout with begin time after end time"
 
-        if not begin_time or not end_time:
-            flash("ERROR: Cannot save a workout without begin time or end time")
-            return render_template("workouts.html",
-                                sports=sports,
-                                sport_type=sport_type,
-                                exercises=exercises,
-                                purposes=purposes,
-                                sport_id=spid,
-                                number_of_exercises=n,
-                                exercise_details=details)         
+        elif not begin_time or not end_time:
+            error_msg = "ERROR: Cannot save a workout without begin time or end time"
 
-        compare_begintime = datetime.strptime(begin_time, "%Y-%m-%dT%H:%M")
-        compare_endtime = datetime.strptime(end_time, "%Y-%m-%dT%H:%M")
-        if compare_begintime > compare_endtime:
-            flash("ERROR: Cannot save a workout with begin time after end time")
-            return render_template("workouts.html",
-                                    sports=sports,
-                                    sport_type=sport_type,
-                                    exercises=exercises,
-                                    purposes=purposes,
-                                    sport_id=spid,
-                                    number_of_exercises=n,
-                                    exercise_details=details)
+        elif len(comments) > 4000:
+            error_msg = "ERROR: Comment too long. Maximum length is 4000 characters."
 
-        if len(comments) > 4000:
-            flash("ERROR: Comment too long. Maximum length is 4000 characters.")
+        if error_msg:
+            flash(error_msg)
             return render_template("workouts.html",
                         sports=sports,
                         sport_type=sport_type,
@@ -563,7 +543,7 @@ def edit_workout():
 
     if source_page == "workout_page.html":
 
-        return render_template("edit_workout.html", 
+        return render_template("edit_workout.html",
                                 workout_id=workout_id,
                                 sport_id=sport_id,
                                 purposes=purposes,
@@ -575,7 +555,7 @@ def edit_workout():
                                 end_time=end_time,
                                 athlete_comment=athlete_comment)
 
-    if source_page == "edit_workout.html":
+    elif source_page == "edit_workout.html":
 
         action = request.form["button_action"]
         details = session.get("workout_details", {})
@@ -623,108 +603,55 @@ def edit_workout():
                                     athlete_comment=athlete_comment)
 
 
-        if action == "save_workout":
+        elif action == "save_workout":
 
+            error_msg = None
             if not details:
-                flash("Cannot save workout without exercises. Please enter exercises.")
-                return render_template("edit_workout.html",
-                        workout_id=workout_id,
-                        sport_id=sport_id,
-                        purposes=purposes,
-                        exercises=exercises,
-                        exercise_details=details,
-                        number_of_exercises=n,
-                        sport_type=sport_type,
-                        begin_time=begin_time,
-                        end_time=end_time,
-                        athlete_comment=athlete_comment)
+                error_msg = "Cannot save workout without exercises. Please enter exercises."
 
+            elif begin_time and end_time:
+                compare_begintime = datetime.strptime(begin_time, "%Y-%m-%dT%H:%M")
+                compare_endtime = datetime.strptime(end_time, "%Y-%m-%dT%H:%M")
+                if compare_begintime > compare_endtime:
+                    error_msg = "ERROR: Cannot save a workout with begin time after end time"
 
+            elif not begin_time or not end_time:
+                error_msg = "ERROR: Cannot save a workout without begin time or end time"
 
-            if not begin_time or not end_time:
-                flash("ERROR: Cannot save a workout without begin time or end time")
-                return render_template("edit_workout.html",
-                        workout_id=workout_id,
-                        sport_id=sport_id,
-                        purposes=purposes,
-                        exercises=exercises,
-                        exercise_details=details,
-                        number_of_exercises=n,
-                        sport_type=sport_type,
-                        begin_time=begin_time,
-                        end_time=end_time,
-                        athlete_comment=athlete_comment)
-
-            compare_begintime = datetime.strptime(begin_time, "%Y-%m-%dT%H:%M")
-            compare_endtime = datetime.strptime(end_time, "%Y-%m-%dT%H:%M")
-            if compare_begintime > compare_endtime:
-                flash("ERROR: Cannot save a workout with begin time after end time")
-                return render_template("edit_workout.html",
-                        workout_id=workout_id,
-                        sport_id=sport_id,
-                        purposes=purposes,
-                        exercises=exercises,
-                        exercise_details=details,
-                        number_of_exercises=n,
-                        sport_type=sport_type,
-                        begin_time=begin_time,
-                        end_time=end_time,
-                        athlete_comment=athlete_comment)
-
-            if len(athlete_comment) > 4000:
-                flash("ERROR: Comment too long. Maximum length is 4000 characters.")
-                return render_template("edit_workout.html",
-                        workout_id=workout_id,
-                        sport_id=sport_id,
-                        purposes=purposes,
-                        exercises=exercises,
-                        exercise_details=details,
-                        number_of_exercises=n,
-                        sport_type=sport_type,
-                        begin_time=begin_time,
-                        end_time=end_time,
-                        athlete_comment=athlete_comment)
+            elif len(athlete_comment) > 4000:
+                error_msg = "ERROR: Comment too long. Maximum length is 4000 characters."
 
 
             for _, exercise in details.items():
+
                 if sport_type == "Endurance":
                     if (not exercise["kilometers"]
                         or not exercise["minutes"]
                         or not exercise["avghr"]):
+                        error_msg = (
+                        "ERROR: Workout information missing. An endurance exercise must \n"
+                        "contain kilometers, minutes and average heart rate.")
 
-                        flash("ERROR: Workout information missing. An endurance exercise must \n"
-                                "contain kilometers, minutes and average heart rate.")
-
-                        return render_template("edit_workout.html",
-                                workout_id=workout_id,
-                                sport_id=sport_id,
-                                purposes=purposes,
-                                exercises=exercises,
-                                exercise_details=details,
-                                number_of_exercises=n,
-                                sport_type=sport_type,
-                                begin_time=begin_time,
-                                end_time=end_time,
-                                athlete_comment=athlete_comment)
-
-                if sport_type == "Strength":
-
+                elif sport_type == "Strength":
                     if not exercise["sets"] or not exercise["reps"]:
+                        error_msg = (
+                        "ERROR: Workout information missing. A strength exercise must \n"
+                        "contain sets and reps. An empty value is allowed in weights.")
 
-                        flash("ERROR: Workout information missing. A strength exercise must \n"
-                                "contain sets and reps. An empty value is allowed in weights.")
+            if error_msg:
+                flash(error_msg)
+                return render_template("edit_workout.html",
+                        workout_id=workout_id,
+                        sport_id=sport_id,
+                        purposes=purposes,
+                        exercises=exercises,
+                        exercise_details=details,
+                        number_of_exercises=n,
+                        sport_type=sport_type,
+                        begin_time=begin_time,
+                        end_time=end_time,
+                        athlete_comment=athlete_comment)
 
-                        return render_template("edit_workout.html",
-                                workout_id=workout_id,
-                                sport_id=sport_id,
-                                purposes=purposes,
-                                exercises=exercises,
-                                exercise_details=details,
-                                number_of_exercises=n,
-                                sport_type=sport_type,
-                                begin_time=begin_time,
-                                end_time=end_time,
-                                athlete_comment=athlete_comment)
 
             user_id = session["user_id"]
             workouts.delete_workout(workout_id)
@@ -732,23 +659,23 @@ def edit_workout():
 
                 if sport_type == "Endurance":
 
-                    workouts.insert_workout(workout_id=workout_id, 
+                    workouts.insert_workout(workout_id=workout_id,
                                             user_id=user_id,
-                                            sport_id=sport_id, 
+                                            sport_id=sport_id,
                                             begin_time=begin_time,
                                             end_time=end_time,
                                             comments=athlete_comment,
                                             exercise_id=exercise["exercise_id"],
                                             purpose_id=exercise["purpose_id"],
                                             minutes=exercise["minutes"],
-                                            avghr=exercise["avghr"], 
+                                            avghr=exercise["avghr"],
                                             kilometers=exercise["kilometers"],
                                             sets=None,
                                             reps=None,
                                             weight=None)
 
                 if sport_type == "Strength":
-                    workouts.insert_workout(workout_id=workout_id, 
+                    workouts.insert_workout(workout_id=workout_id,
                                             user_id=user_id,
                                             sport_id=sport_id,
                                             begin_time=begin_time,
@@ -768,7 +695,13 @@ def edit_workout():
             session.pop("exercise_details", None)
             session.pop("number_of_exercises", None)
 
-            return show_workout(workout_id=workout_id)
+            return redirect(f"/workouts/{workout_id}")
+
+        flash("Invalid action")
+        return redirect("/")
+
+    flash("Invalid source page")
+    return redirect("/")
 
 
 

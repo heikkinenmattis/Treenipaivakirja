@@ -28,7 +28,7 @@ def check_login(username, password):
 
 def add_userdata(username, first_name, last_name, date_of_birth, height, weight,
                  max_heart_rate, ftp_cycling, fav_sport, city):
-    sql = """UPDATE users SET 
+    sql = """UPDATE users SET
                 first_name = ?, 
                 last_name = ?, 
                 date_of_birth = ?, 
