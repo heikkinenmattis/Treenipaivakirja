@@ -3,7 +3,7 @@ import db
 
 
 def fetch_exercises(sport_id):
-    sql = """   SELECT DISTINCT e.exercise_name, e.exercise_id   
+    sql = """   SELECT DISTINCT e.exercise_name, e.exercise_id
                 FROM exercises_and_sports es
                 JOIN exercises e
                     on es.exercise_id = e.exercise_id
@@ -25,7 +25,7 @@ def fetch_sport_type(sport_id):
     return db.query(sql, [sport_id])
 
 
-def insert_workout(workout_id, user_id, sport_id, begin_time, end_time, comments, sets, 
+def insert_workout(workout_id, user_id, sport_id, begin_time, end_time, comments, sets,
                    reps, weight, minutes, avghr, kilometers, exercise_id, purpose_id):
     sql = """   INSERT INTO workouts (  workout_id,
                                         user_id,
@@ -51,7 +51,7 @@ def insert_workout(workout_id, user_id, sport_id, begin_time, end_time, comments
 
 
 def fetch_purposes(sport_type):
-    sql = """   SELECT DISTINCT p.purpose_id, p.purpose_name 
+    sql = """   SELECT DISTINCT p.purpose_id, p.purpose_name
                 FROM sports s 
                 JOIN exercises_and_sports es 
                     on s.sport_id = es.sport_id 
@@ -67,7 +67,7 @@ def fetch_purposes(sport_type):
 
 def get_workouts(page=1, page_size=20):
     starting_point = (page-1) * page_size
-    sql = """   select distinct         
+    sql = """   select distinct
                         
                         w.workout_id,
                         w.user_id,

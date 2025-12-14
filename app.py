@@ -295,6 +295,17 @@ def add_workout():
         elif len(comments) > 4000:
             error_msg = "ERROR: Comment too long. Maximum length is 4000 characters."
 
+        for _, exercise in details.items():
+            if sport_type == "Endurance":
+                if not exercise["kilometers"] or not exercise["minutes"] or not exercise["avghr"]:
+                    error_msg = ("ERROR: Workout information missing. An endurance exercise must \n"
+                                "contain kilometers, minutes and average heart rate.")
+
+            if sport_type == "Strength":
+                if not exercise["sets"] or not exercise["reps"]:
+                    error_msg = ("ERROR: Workout information missing. A strength exercise must \n"
+                                "contain sets and reps. An empty value is allowed in weights.")
+
         if error_msg:
             flash(error_msg)
             return render_template("workouts.html",
@@ -307,22 +318,7 @@ def add_workout():
                         exercise_details=details)
 
         for _, exercise in details.items():
-
             if sport_type == "Endurance":
-
-                if not exercise["kilometers"] or not exercise["minutes"] or not exercise["avghr"]:
-                    flash("ERROR: Workout information missing. An endurance exercise must \n"
-                            "contain kilometers, minutes and average heart rate.")
-
-                    return render_template("workouts.html",
-                                sports=sports,
-                                sport_type=sport_type,
-                                exercises=exercises,
-                                purposes=purposes,
-                                sport_id=spid,
-                                number_of_exercises=n,
-                                exercise_details=details)
-
                 workouts.insert_workout(workout_id=workout_id,
                                         user_id=user_id,
                                         sport_id=spid,
@@ -339,20 +335,6 @@ def add_workout():
                                         weight=None)
 
             if sport_type == "Strength":
-
-                if not exercise["sets"] or not exercise["reps"]:
-                    flash("ERROR: Workout information missing. A strength exercise must \n"
-                            "contain sets and reps. An empty value is allowed in weights.")
-
-                    return render_template("workouts.html",
-                        sports=sports,
-                        sport_type=sport_type,
-                        exercises=exercises,
-                        purposes=purposes,
-                        sport_id=spid,
-                        number_of_exercises=n,
-                        exercise_details=details)
-
                 workouts.insert_workout(workout_id=workout_id,
                                         user_id=user_id,
                                         sport_id=spid,
@@ -373,14 +355,10 @@ def add_workout():
         session.pop("exercise_details", None)
         session.pop("number_of_exercises", None)
 
-        return render_template("workouts.html",
-                                sports=sports,
-                                sport_type=sport_type,
-                                exercises=exercises,
-                                purposes=purposes,
-                                sport_id=spid,
-                                number_of_exercises=n,
-                                exercise_details=details)
+        return redirect("/")
+
+    flash("Invalid action")
+    return redirect("/")
 
 
 
@@ -508,11 +486,16 @@ def delete_workout():
     if source_page == "user_page.html":
         user_id = request.form["user_id"]
         workouts.delete_workout(workout_id)
+        flash("Workout deleted succesfully.")
         return show_user(user_id=user_id)
 
     if source_page == "workout_page.html":
         workouts.delete_workout(workout_id)
+        flash("Workout deleted succesfully.")
         return redirect("/")
+
+    flash("Invalid source page")
+    return redirect("/")
 
 
 @app.route("/edit_workout", methods=["POST"])
@@ -555,7 +538,7 @@ def edit_workout():
                                 end_time=end_time,
                                 athlete_comment=athlete_comment)
 
-    elif source_page == "edit_workout.html":
+    if source_page == "edit_workout.html":
 
         action = request.form["button_action"]
         details = session.get("workout_details", {})
@@ -603,7 +586,7 @@ def edit_workout():
                                     athlete_comment=athlete_comment)
 
 
-        elif action == "save_workout":
+        if action == "save_workout":
 
             error_msg = None
             if not details:

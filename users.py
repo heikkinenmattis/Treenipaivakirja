@@ -21,8 +21,7 @@ def check_login(username, password):
     password_hash = result[0]["password_hash"]
     if check_password_hash(password_hash, password):
         return user_id
-    else:
-        return None
+    return None
 
 
 
@@ -74,7 +73,7 @@ def fetch_userdata(user_id):
 
 def fetch_user_workouts(user_id, page=1, page_size=20):
     starting_point = (page-1) * page_size
-    sql = """select distinct 
+    sql = """select distinct
                         
                         w.workout_id,
                         w.user_id,
